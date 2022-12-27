@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:got_a_min_flutter/adapter/solana/accounts/location_account.dart';
-import 'package:got_a_min_flutter/adapter/solana/accounts/test_account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/location/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
@@ -55,7 +55,7 @@ void main() {
         programId: _programId,
         method: 'init_location',
         arguments: ByteArray(
-          Basic1Arguments(
+          InitLocation(
             name: "name",
             position: BigInt.from(100),
             capacity: BigInt.from(100),
@@ -96,101 +96,5 @@ void main() {
     expect(decoded.name, 'name');
   });
 
-  test('Reading Stuff', () async {
-    final stuff = Ed25519HDPublicKey.fromBase58("FCHm4Ef3b1aKpBPTk6XkKsQwf8Z3zUhkh6VbZuSrwDi8");
-    final account = await client.rpcClient.getAccountInfo(
-      stuff.toBase58(),
-      commitment: Commitment.confirmed,
-      encoding: Encoding.base64,
-    );
-
-    debugPrint("Account: $account");
-    var decoded = TestAccount.fromAccountData(account!.data!);
-    debugPrint("decoded: $decoded");
-
-  });
-
-  /*test('Testing Stuff', () async {
-    // 8 bytes for the discriminator and 8 bytes for the data
-    //const space = 16;
-    //final rent = await client.rpcClient.getMinimumBalanceForRentExemption(space);
-
-    final instructions = [
-      await AnchorInstruction.forMethod(
-        programId: _programId,
-        method: 'stuff',
-        arguments: ByteArray(
-          TestArguments(
-            number: BigInt.from(100),
-          ).toBorsh().toList(),
-        ),
-        accounts: <AccountMeta>[
-          AccountMeta.writeable(pubKey: location.publicKey, isSigner: true),
-          AccountMeta.writeable(pubKey: payer.publicKey, isSigner: true),
-          AccountMeta.readonly(pubKey: Ed25519HDPublicKey.fromBase58(SystemProgram.programId), isSigner: false),
-        ],
-        namespace: 'global',
-      ),
-    ];
-    final message = Message(instructions: instructions);
-    await client.sendAndConfirmTransaction(
-      message: message,
-      signers: [
-        location,
-        payer,
-      ],
-      commitment: Commitment.confirmed,
-    );
-
-    /*final account = await client.rpcClient.getAccountInfo(
-      location.address,
-      commitment: Commitment.confirmed,
-    );
-
-    debugPrint("Result: $account");
-    */
-  });*/
-
-  /*test(
-    'Call basic-1 update method',
-        () async {
-      // Call update
-      final instructions = [
-        await AnchorInstruction.forMethod(
-          programId: _basic1,
-          method: 'update',
-          arguments: ByteArray(
-            Basic1Arguments(data: BigInt.from(25)).toBorsh().toList(),
-          ),
-          accounts: <AccountMeta>[
-            AccountMeta.writeable(pubKey: updater.publicKey, isSigner: false),
-          ],
-          namespace: 'global',
-        ),
-      ];
-
-      final message = Message(instructions: instructions);
-      await client.sendAndConfirmTransaction(
-        message: message,
-        signers: [payer],
-        commitment: Commitment.confirmed,
-      );
-
-      final discriminator = await computeDiscriminator('account', 'MyAccount');
-      final account = await client.rpcClient.getAccountInfo(
-        updater.address,
-        commitment: Commitment.confirmed,
-      );
-
-      expect(account, isNotNull);
-      final rawData = account?.data;
-      expect(rawData, isNotNull);
-      // ignore: avoid-non-null-assertion, cannot be null here
-      final dataAccount = Basic1DataAccount.fromAccountData(rawData!);
-      expect(dataAccount.data, equals(25));
-      expect(dataAccount.discriminator, equals(discriminator));
-    },
-    skip: true,
-  );*/
 }
 

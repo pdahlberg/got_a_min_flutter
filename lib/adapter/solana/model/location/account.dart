@@ -3,7 +3,7 @@ import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/solana.dart';
 
-part 'location_account.g.dart';
+part 'account.g.dart';
 
 class LocationAccount implements AnchorAccount {
   const LocationAccount._({
@@ -67,18 +67,5 @@ class _AccountData with _$_AccountData {
 
   factory _AccountData.fromBorsh(Uint8List data) =>
       _$_AccountDataFromBorsh(data);
-}
-
-@BorshSerializable()
-class InitLocationArguments with _$InitLocationArguments {
-  factory InitLocationArguments({
-    @BString() required String name,
-    @BU64() required BigInt position,
-    @BU64() required BigInt capacity,
-  }) = _InitLocationArguments;
-
-  InitLocationArguments._();
-
-  factory InitLocationArguments.fromBorsh(Uint8List data) => _$InitLocationArgumentsFromBorsh(data);
 }
 

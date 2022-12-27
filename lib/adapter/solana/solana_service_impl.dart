@@ -1,8 +1,8 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
-import 'package:got_a_min_flutter/domain/model/address.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
@@ -12,7 +12,7 @@ import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';
 
-import 'accounts/location_account.dart';
+import 'model/location/account.dart';
 
 class SolanaServiceImpl extends SolanaServicePort {
 
@@ -65,52 +65,15 @@ class SolanaServiceImpl extends SolanaServicePort {
   init(Item item) async {
     await devAirdrop(item.id.publicKey);
 
-    final payer = item.owner!;
     final location = item;
 
-    final instructions = [
-      await AnchorInstruction.forMethod(
-        programId: _programId,
-        method: 'init_location',
-        arguments: ByteArray(
-          InitLocationArguments(
-            name: "name",
-            position: BigInt.from(100),
-            capacity: BigInt.from(100),
-          ).toBorsh().toList(),
-        ),
-        accounts: <AccountMeta>[
-          AccountMeta.writeable(pubKey: location.id.keyPair!.publicKey, isSigner: true),
-          AccountMeta.writeable(pubKey: payer.keyPair.publicKey, isSigner: true),
-          AccountMeta.readonly(pubKey: Ed25519HDPublicKey.fromBase58(SystemProgram.programId), isSigner: false),
-        ],
-        namespace: 'global',
-      ),
-    ];
-    final message = Message(instructions: instructions);
-    await _solanaClient.sendAndConfirmTransaction(
-      message: message,
-      signers: [
-        location.id.keyPair!,
-        payer.keyPair,
-      ],
-      commitment: Commitment.confirmed,
-    );
+    InvokeInitLocation(_solanaClient, _programId, item.owner!).run(location);
   }
 
   @override
-  Future<LocationDto> fetchLocationAccount(Item item) async {
-    final account = await _solanaClient.rpcClient.getAccountInfo(
-      item.id.publicKey.toBase58(),
-      commitment: Commitment.confirmed,
-      encoding: Encoding.base64,
-    );
-
-    debugPrint("Account: $account");
+  Future<LocationDto> fetchLocationAccount(Item item, ) async {
+    final account = await _fetchAccountInfo(item.id.publicKey);
     var decoded = LocationAccount.fromAccountData(account!.data!);
-    //debugPrint("owner: ${payer.keyPair.publicKey.toBase58()}");
-    debugPrint("decoded: $decoded");
-
     return LocationDto(
       true,
       decoded.name,
@@ -121,6 +84,11 @@ class SolanaServiceImpl extends SolanaServicePort {
     );
   }
 
-
-
+  Future<Account?> _fetchAccountInfo(Ed25519HDPublicKey publicKey) async {
+    return await _solanaClient.rpcClient.getAccountInfo(
+      publicKey.toBase58(),
+      commitment: Commitment.confirmed,
+      encoding: Encoding.base64,
+    );
+  }
 }
