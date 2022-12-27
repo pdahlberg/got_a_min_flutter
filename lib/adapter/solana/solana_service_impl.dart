@@ -73,7 +73,7 @@ class SolanaServiceImpl extends SolanaServicePort {
         programId: _programId,
         method: 'init_location',
         arguments: ByteArray(
-          Basic1Arguments(
+          InitLocationArguments(
             name: "name",
             position: BigInt.from(100),
             capacity: BigInt.from(100),

@@ -70,56 +70,15 @@ class _AccountData with _$_AccountData {
 }
 
 @BorshSerializable()
-class Basic1Arguments with _$Basic1Arguments {
-  factory Basic1Arguments({
+class InitLocationArguments with _$InitLocationArguments {
+  factory InitLocationArguments({
     @BString() required String name,
     @BU64() required BigInt position,
     @BU64() required BigInt capacity,
-  }) = _Basic1Arguments;
+  }) = _InitLocationArguments;
 
-  Basic1Arguments._();
+  InitLocationArguments._();
 
-  factory Basic1Arguments.fromBorsh(Uint8List data) => _$Basic1ArgumentsFromBorsh(data);
+  factory InitLocationArguments.fromBorsh(Uint8List data) => _$InitLocationArgumentsFromBorsh(data);
 }
 
-@BorshSerializable()
-class TestArguments with _$TestArguments {
-  factory TestArguments({
-    @BU64() required BigInt value,
-  }) = _TestArguments;
-
-  TestArguments._();
-
-  factory TestArguments.fromBorsh(Uint8List data) => _$TestArgumentsFromBorsh(data);
-}
-
-/*class TestAccount implements AnchorAccount {
-  const TestAccount._({
-    required this.discriminator,
-    required this.data,
-  });
-
-  factory TestAccount._fromBinary(
-      List<int> bytes,
-      ) {
-    final accountData = _AccountData.fromBorsh(Uint8List.fromList(bytes));
-
-    return TestAccount._(
-      discriminator: bytes.sublist(0, 8),
-      data: accountData.data.toInt(),
-    );
-  }
-
-  factory TestAccount.fromAccountData(AccountData accountData) {
-    if (accountData is BinaryAccountData) {
-      return TestAccount._fromBinary(accountData.data);
-    } else {
-      throw const FormatException('invalid account data found');
-    }
-  }
-
-  @override
-  final List<int> discriminator;
-
-  final int data;
-}*/

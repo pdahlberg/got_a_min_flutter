@@ -73,7 +73,7 @@ _AccountData _$_AccountDataFromBorsh(Uint8List data) {
   return const B_AccountData().read(reader);
 }
 
-mixin _$Basic1Arguments {
+mixin _$InitLocationArguments {
   String get name => throw UnimplementedError();
   BigInt get position => throw UnimplementedError();
   BigInt get capacity => throw UnimplementedError();
@@ -89,8 +89,8 @@ mixin _$Basic1Arguments {
   }
 }
 
-class _Basic1Arguments extends Basic1Arguments {
-  _Basic1Arguments({
+class _InitLocationArguments extends InitLocationArguments {
+  _InitLocationArguments({
     required this.name,
     required this.position,
     required this.capacity,
@@ -101,17 +101,17 @@ class _Basic1Arguments extends Basic1Arguments {
   final BigInt capacity;
 }
 
-class BBasic1Arguments implements BType<Basic1Arguments> {
-  const BBasic1Arguments();
+class BInitLocationArguments implements BType<InitLocationArguments> {
+  const BInitLocationArguments();
 
   @override
-  void write(BinaryWriter writer, Basic1Arguments value) {
+  void write(BinaryWriter writer, InitLocationArguments value) {
     writer.writeStruct(value.toBorsh());
   }
 
   @override
-  Basic1Arguments read(BinaryReader reader) {
-    return Basic1Arguments(
+  InitLocationArguments read(BinaryReader reader) {
+    return InitLocationArguments(
       name: const BString().read(reader),
       position: const BU64().read(reader),
       capacity: const BU64().read(reader),
@@ -119,50 +119,8 @@ class BBasic1Arguments implements BType<Basic1Arguments> {
   }
 }
 
-Basic1Arguments _$Basic1ArgumentsFromBorsh(Uint8List data) {
+InitLocationArguments _$InitLocationArgumentsFromBorsh(Uint8List data) {
   final reader = BinaryReader(data.buffer.asByteData());
 
-  return const BBasic1Arguments().read(reader);
-}
-
-mixin _$TestArguments {
-  BigInt get value => throw UnimplementedError();
-
-  Uint8List toBorsh() {
-    final writer = BinaryWriter();
-
-    const BU64().write(writer, value);
-
-    return writer.toArray();
-  }
-}
-
-class _TestArguments extends TestArguments {
-  _TestArguments({
-    required this.value,
-  }) : super._();
-
-  final BigInt value;
-}
-
-class BTestArguments implements BType<TestArguments> {
-  const BTestArguments();
-
-  @override
-  void write(BinaryWriter writer, TestArguments value) {
-    writer.writeStruct(value.toBorsh());
-  }
-
-  @override
-  TestArguments read(BinaryReader reader) {
-    return TestArguments(
-      value: const BU64().read(reader),
-    );
-  }
-}
-
-TestArguments _$TestArgumentsFromBorsh(Uint8List data) {
-  final reader = BinaryReader(data.buffer.asByteData());
-
-  return const BTestArguments().read(reader);
+  return const BInitLocationArguments().read(reader);
 }
