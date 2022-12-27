@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:got_a_min_flutter/location_account.dart';
-import 'package:got_a_min_flutter/test_account.dart';
+import 'package:got_a_min_flutter/adapter/solana/accounts/location_account.dart';
+import 'package:got_a_min_flutter/adapter/solana/accounts/test_account.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
