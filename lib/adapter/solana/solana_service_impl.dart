@@ -71,9 +71,8 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
-  Future<LocationDto> fetchLocationAccount(Item item, ) async {
-    final account = await _fetchAccountInfo(item.id.publicKey);
-    var decoded = LocationAccount.fromAccountData(account!.data!);
+  Future<LocationDto> fetchLocationAccount(Item item) async {
+    LocationAccount decoded = await _fetchAccountInfo(item.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
       true,
       decoded.name,
@@ -84,11 +83,12 @@ class SolanaServiceImpl extends SolanaServicePort {
     );
   }
 
-  Future<Account?> _fetchAccountInfo(Ed25519HDPublicKey publicKey) async {
-    return await _solanaClient.rpcClient.getAccountInfo(
+  Future<T?> _fetchAccountInfo<T>(Ed25519HDPublicKey publicKey, Function(AccountData data) decode) async {
+    final account = await _solanaClient.rpcClient.getAccountInfo(
       publicKey.toBase58(),
       commitment: Commitment.confirmed,
       encoding: Encoding.base64,
     );
+    return decode(account!.data!);
   }
 }
