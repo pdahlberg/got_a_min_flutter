@@ -67,7 +67,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
     final location = item;
 
-    InvokeInitLocation(_solanaClient, _programId, item.owner!).run(location);
+    await InvokeInitLocation(_solanaClient, _programId, item.owner!).run(location);
   }
 
   @override
