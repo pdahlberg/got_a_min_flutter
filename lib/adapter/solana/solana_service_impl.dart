@@ -2,6 +2,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
@@ -68,6 +69,7 @@ class SolanaServiceImpl extends SolanaServicePort {
     final location = item;
 
     await InvokeInitLocation(_solanaClient, _programId, item.owner!).run(location);
+    //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
   }
 
   @override
