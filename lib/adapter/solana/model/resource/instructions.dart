@@ -4,6 +4,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';
@@ -29,7 +30,7 @@ class InvokeInitResource extends InvokeBase<InitResource> {
 
   InvokeInitResource(super.client, super.programId, super.owner);
 
-  run(Item resource) async {
+  run(Resource resource) async {
     await send(
       method: 'init_resource',
       params: InitResource(

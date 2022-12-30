@@ -5,6 +5,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dar
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
@@ -63,18 +64,16 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
-  init(Item item) async {
-    await devAirdrop(item.id.publicKey);
+  initLocation(Location location) async {
+    await devAirdrop(location.id.publicKey);
 
-    final location = item;
-
-    await InvokeInitLocation(_solanaClient, _programId, item.owner!).run(location);
+    await InvokeInitLocation(_solanaClient, _programId, location.owner!).run(location);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
   }
 
   @override
-  Future<LocationDto> fetchLocationAccount(Item item) async {
-    LocationAccount decoded = await _fetchAccountInfo(item.id.publicKey, LocationAccount.fromAccountData);
+  Future<LocationDto> fetchLocationAccount(Location location) async {
+    LocationAccount decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
       true,
       decoded.name,

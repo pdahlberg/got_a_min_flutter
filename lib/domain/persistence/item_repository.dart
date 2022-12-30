@@ -19,11 +19,15 @@ class ItemRepository {
   );
 
   Item save(Item item) {
-    final toSave = item.copyWith(
+    /*final toSave = item.copyWith(
       timestamp: _timeService.nowMillis(),
-    );
+    );*/
 
-    return db[toSave.id] = toSave;
+    return db.update(
+      item.id,
+      (value) => item,
+      ifAbsent: () => item,
+    );
   }
 
   Item? findById(ItemId id) {

@@ -16,10 +16,9 @@ class ItemDetailsBloc extends Bloc<ItemDetailsEvent, ItemDetailsState> {
   ItemDetailsBloc(
       this._itemRepository,
       this._solanaServicePort,
-  ) : super(const ItemDetailsState(item: Item.empty())) {
+  ) : super(const ItemDetailsState(item_: null)) {
     on<ItemAskedFor>(_onAskedFor);
     on<ItemAddressAskedFor>(_onAddressAskedFor);
-    on<ItemInitialized>(_onItemInit);
   }
 
   ItemDetailsBloc.of(BuildContext context) : this(
@@ -29,27 +28,18 @@ class ItemDetailsBloc extends Bloc<ItemDetailsEvent, ItemDetailsState> {
 
   bool stateSyncNeeded({ ItemId? id, String? address }) {
     debugPrint("stateSyncNeeded 1 [$id, $address]");
-    if(state.item.id.keyPair == null) {
+    if(state.item_?.id.keyPair == null) {
       return true;
     } else if(id != null) {
       debugPrint("stateSyncNeeded 2");
-      return state.item.id != id;
+      return state.item_?.id != id;
     } else if(address != null) {
       debugPrint("stateSyncNeeded 3");
-      return state.item.id.publicKey.toBase58() != address;
+      return state.item_?.id.publicKey.toBase58() != address;
     } else {
       debugPrint("stateSyncNeeded 4");
       throw UnimplementedError("ItemDetailsBloc.stateSyncNeeded called without params");
     }
-  }
-
-  Future<void> _onItemInit(ItemInitialized event, Emitter<ItemDetailsState> emit) async {
-    await _solanaServicePort.init(event.item);
-    final dto = await _solanaServicePort.fetchLocationAccount(event.item);
-
-    emit(state.copyWith(
-      item: dto.updateByCopy(event.item),
-    ));
   }
 
   Future<void> _onAskedFor(ItemAskedFor event, Emitter<ItemDetailsState> emit) async {
@@ -62,7 +52,7 @@ class ItemDetailsBloc extends Bloc<ItemDetailsEvent, ItemDetailsState> {
       //addError(errorMsg);
       emit(ItemDetailsState.error(errorMsg));
     } else {
-      emit(ItemDetailsState(item: item));
+      emit(ItemDetailsState(item_: item));
     }
   }
 
@@ -78,7 +68,7 @@ class ItemDetailsBloc extends Bloc<ItemDetailsEvent, ItemDetailsState> {
       //addError(errorMsg);
       emit(ItemDetailsState.error(errorMsg));
     } else {
-      emit(ItemDetailsState(item: item));
+      emit(ItemDetailsState(item_: item));
     }
   }
 

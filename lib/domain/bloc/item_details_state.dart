@@ -6,26 +6,28 @@ import 'package:got_a_min_flutter/domain/model/item.dart';
 class ItemDetailsState extends ResultBaseState {
 
   const ItemDetailsState({
-    required this.item,
+    required this.item_,
     String? errorMsg,
   }) : super(errorMsg);
 
-  const ItemDetailsState.error(String msg) : this(item: const Item.empty(), errorMsg: msg);
+  const ItemDetailsState.error(String msg) : this(item_: null, errorMsg: msg);
 
-  final Item item;
+  final Item? item_;
+
+  Item get item => item_!;
 
   ItemDetailsState copyWith({
     Item? item,
     ValueGetter<String?>? errorMsg,
   }) {
     return ItemDetailsState(
-      item: item ?? this.item,
+      item_: item ?? this.item_,
       errorMsg: errorMsg != null ? errorMsg() : super.errorMsg,
     );
   }
 
   @override
-  List<Object?> get props => [item, isOk];
+  List<Object?> get props => [item_, isOk];
 
 }
 

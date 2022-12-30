@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_details_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_details_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_details_state.dart';
+import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
 class ItemDetailsPage extends StatelessWidget implements AutoRouteWrapper {
@@ -38,16 +40,16 @@ class ItemDetailsPage extends StatelessWidget implements AutoRouteWrapper {
     return BlocListener<ItemDetailsBloc, ItemDetailsState>(
       listener: (context, state) {
         debugPrint("ItemDetailsState -> build: ${address} (inside listener)");
-        debugPrint("ItemDetailsState -> state: ${state.item.id} (listener)");
+        debugPrint("ItemDetailsState -> state: ${state.item_?.id} (listener)");
       },
       child: BlocBuilder<ItemDetailsBloc, ItemDetailsState>(
         builder: (context, state) {
           debugPrint("ItemDetailsState -> build: ${address} (inside builder)");
-          debugPrint("ItemDetailsState -> state: ${state.item.id} (builder)");
+          debugPrint("ItemDetailsState -> state: ${state.item_?.id} (builder)");
 
           if(state.isError) {
             return Text(state.getErrorMsg());
-          } else if(state.item.id.keyPair == null || address != state.item.id.publicKey.toBase58()) {
+          } else if(state.item_?.id.keyPair == null || address != state.item_?.id.publicKey.toBase58()) {
             return const CircularProgressIndicator();
           } else {
             return ItemDetailsBody(
@@ -78,13 +80,18 @@ class ItemDetailsBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(item.id.publicKey.toBase58()),
-            Text(item.name),
+            Text(item.label()),
             const Text("..."),
             Text("~${item.timestamp}~"),
             Row(
               children: [
                 TextButton(
-                  onPressed: item.initialized ? null : () => context.itemDetailsBloc.add(ItemInitialized(item)),
+                  onPressed: item.initialized ? null : () {
+                    if(item.runtimeType == Location) {
+                      final location = item as Location;
+                      context.itemListBloc.add(LocationInitialized(location));
+                    }
+                  },
                   child: const Text("Init"),
                 ),
                 TextButton(

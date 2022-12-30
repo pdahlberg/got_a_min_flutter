@@ -19,13 +19,6 @@ class LocationDto {
     this.position,
   );
 
-  Item updateByCopy(Item item) {
-    assert(item.owner?.keyPair.publicKey.toBase58() == owner);
 
-    return item.copyWith(
-      initialized: initialized,
-      name: name,
-    );
-  }
 
 }
