@@ -34,9 +34,9 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
     await send(
       method: 'init_location',
       params: InitLocation(
-        name: "name",
-        position: BigInt.from(100),
-        capacity: BigInt.from(100),
+        name: location.name,
+        position: BigInt.from(location.position),
+        capacity: BigInt.from(location.capacity),
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: true),

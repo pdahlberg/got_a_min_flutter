@@ -34,7 +34,7 @@ class InvokeInitResource extends InvokeBase<InitResource> {
     await send(
       method: 'init_resource',
       params: InitResource(
-        name: "name",
+        name: resource.name,
         input1: [],
         input2: [],
         input_amount1: BigInt.from(0),

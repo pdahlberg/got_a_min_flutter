@@ -2,11 +2,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
+import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
 import 'package:solana/anchor.dart';
@@ -72,8 +75,16 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  initResource(Resource resource) async {
+    await devAirdrop(resource.id.publicKey);
+
+    await InvokeInitResource(_solanaClient, _programId, resource.owner!).run(resource);
+    //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
+  }
+
+  @override
   Future<LocationDto> fetchLocationAccount(Location location) async {
-    LocationAccount decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
+    final decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
       true,
       decoded.name,
@@ -81,6 +92,16 @@ class SolanaServiceImpl extends SolanaServicePort {
       decoded.occupied_space,
       decoded.capacity,
       decoded.position,
+    );
+  }
+
+  @override
+  Future<ResourceDto> fetchResourceAccount(Resource resource) async {
+    final decoded = await _fetchAccountInfo(resource.id.publicKey, ResourceAccount.fromAccountData);
+    return ResourceDto(
+      true,
+      decoded.name,
+      decoded.owner.toBase58(),
     );
   }
 

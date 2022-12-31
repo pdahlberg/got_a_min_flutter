@@ -1,18 +1,15 @@
 
+import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
-class Resource {
+class Resource extends Item {
 
-  final ItemId id;
   final String name;
-  final int timestamp;
-  final Owner? owner;
-  final bool initialized;
 
-  const Resource(this.id, this.name, this.timestamp, this.owner, this.initialized);
-  const Resource.from(String name) : this(const ItemId.empty(), name, 0, null, false);
-  const Resource.empty() : this(const ItemId.empty(), "", 0, null, false);
+  const Resource(super.id, super.owner, super.initialized, super.timestamp, this.name);
+  const Resource.empty() : this(const ItemId.empty(), null, false, 0, "");
 
   Resource copyWith({
     ItemId? id,
@@ -23,19 +20,26 @@ class Resource {
   }) {
     return Resource(
       id ?? this.id,
-      name ?? this.name,
-      timestamp ?? this.timestamp,
       owner ?? this.owner,
       initialized ?? this.initialized,
+      timestamp ?? this.timestamp,
+      name ?? this.name,
     );
   }
 
   @override
+  String label() => "$name ${id.publicKey.toShortString()}";
+
+
+  @override
   String toString() {
-    return 'Resource{id: $id, name: $name}';
+    return 'Resource{name: $name, ${super.toStringProps()}}';
   }
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [
+    ...super.props,
+    name,
+  ];
 
 }

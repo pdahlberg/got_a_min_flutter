@@ -14,5 +14,17 @@ abstract class Item extends Equatable {
 
   String label();
 
+  @override
+  String toString() {
+    return 'Item{${toStringProps()}}';
+  }
+
+  String toStringProps() {
+    return 'id: $id, owner: $owner, initialized: $initialized, timestamp: $timestamp';
+  }
+
+  @override
+  List<Object?> get props => [id, owner, initialized, timestamp];
+
 }
 

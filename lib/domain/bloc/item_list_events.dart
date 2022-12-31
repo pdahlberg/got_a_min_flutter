@@ -1,6 +1,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/resource.dart';
 
 abstract class ItemListEvent extends Equatable {
   const ItemListEvent();
@@ -25,3 +26,18 @@ class LocationInitialized extends ItemListEvent {
   @override
   List<Object?> get props => [location];
 }
+
+class ResourceCreated extends ItemListEvent {
+  final String name;
+  const ResourceCreated(this.name);
+}
+
+class ResourceInitialized extends ItemListEvent {
+  final Resource resource;
+
+  const ResourceInitialized(this.resource);
+
+  @override
+  List<Object?> get props => [resource];
+}
+
