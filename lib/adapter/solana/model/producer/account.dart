@@ -10,11 +10,10 @@ class StorageAccount implements AnchorAccount {
     required this.owner,
     required this.resourceId,
     required this.locationId,
-    required this.amount,
-    required this.capacity,
-    required this.mobilityType,
-    required this.movementSpeed,
-    required this.arrivesAt,
+    required this.productionRate,
+    required this.productionTime,
+    required this.awaitingUnits,
+    required this.claimedAt,
   });
 
   factory StorageAccount._fromBinary(
@@ -27,11 +26,10 @@ class StorageAccount implements AnchorAccount {
       owner: Ed25519HDPublicKey(accountData.owner),
       resourceId: Ed25519HDPublicKey(accountData.resourceId),
       locationId: Ed25519HDPublicKey(accountData.locationId),
-      amount: accountData.amount.toInt(),
-      capacity: accountData.capacity.toInt(),
-      mobilityType: accountData.mobility_type.toString(),
-      movementSpeed: accountData.movement_speed.toInt(),
-      arrivesAt: accountData.arrives_at.toInt(),
+      productionRate: accountData.production_rate.toInt(),
+      productionTime: accountData.production_time.toInt(),
+      awaitingUnits: accountData.awaiting_units.toInt(),
+      claimedAt: accountData.claimed_at.toInt(),
     );
   }
 
@@ -48,15 +46,14 @@ class StorageAccount implements AnchorAccount {
   final Ed25519HDPublicKey owner;
   final Ed25519HDPublicKey resourceId;
   final Ed25519HDPublicKey locationId;
-  final int amount;
-  final int capacity;
-  final String mobilityType;
-  final int movementSpeed;
-  final int arrivesAt;
+  final int productionRate;
+  final int productionTime;
+  final int awaitingUnits;
+  final int claimedAt;
 
   @override
   String toString() {
-    return 'StorageAccount{discriminator: $discriminator, owner: $owner, resourceId: $resourceId, locationId: $locationId, amount: $amount, capacity: $capacity, mobilityType: $mobilityType, movementSpeed: $movementSpeed, arrivesAt: $arrivesAt}';
+    return 'StorageAccount{discriminator: $discriminator, owner: $owner, resourceId: $resourceId, locationId: $locationId, productionRate: $productionRate, productionTime: $productionTime, awaitingUnits: $awaitingUnits, claimedAt: $claimedAt}';
   }
 }
 
@@ -64,11 +61,10 @@ class StorageAccount implements AnchorAccount {
     pub owner: Pubkey,
     pub resource_id: Pubkey,
     pub location_id: Pubkey,
-    pub amount: i64,
-    pub capacity: i64,
-    pub mobility_type: MobilityType,
-    pub movement_speed: i64,
-    pub arrives_at: i64,
+    pub production_rate: i64,   // Produce this many units per [production_time].
+    pub production_time: i64,
+    pub awaiting_units: i64,    // This amount can be claimed after waiting [production_time] * [awaiting_units] seconds.
+    pub claimed_at: i64,
  */
 @BorshSerializable()
 class _AccountData with _$_AccountData {
@@ -77,11 +73,10 @@ class _AccountData with _$_AccountData {
     @BFixedArray(32, BU8()) required List<int> owner,
     @BFixedArray(32, BU8()) required List<int> resourceId,
     @BFixedArray(32, BU8()) required List<int> locationId,
-    @BU64() required BigInt amount,
-    @BU64() required BigInt capacity,
-    @BString() required String mobility_type,
-    @BU64() required BigInt movement_speed,
-    @BU64() required BigInt arrives_at,
+    @BU64() required BigInt production_rate,
+    @BU64() required BigInt production_time,
+    @BU64() required BigInt awaiting_units,
+    @BU64() required BigInt claimed_at,
   }) = __AccountData;
 
   _AccountData._();

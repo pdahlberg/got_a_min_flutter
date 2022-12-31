@@ -11,11 +11,10 @@ mixin _$_AccountData {
   List<int> get owner => throw UnimplementedError();
   List<int> get resourceId => throw UnimplementedError();
   List<int> get locationId => throw UnimplementedError();
-  BigInt get amount => throw UnimplementedError();
-  BigInt get capacity => throw UnimplementedError();
-  String get mobility_type => throw UnimplementedError();
-  BigInt get movement_speed => throw UnimplementedError();
-  BigInt get arrives_at => throw UnimplementedError();
+  BigInt get production_rate => throw UnimplementedError();
+  BigInt get production_time => throw UnimplementedError();
+  BigInt get awaiting_units => throw UnimplementedError();
+  BigInt get claimed_at => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
@@ -24,11 +23,10 @@ mixin _$_AccountData {
     const BFixedArray(32, BU8()).write(writer, owner);
     const BFixedArray(32, BU8()).write(writer, resourceId);
     const BFixedArray(32, BU8()).write(writer, locationId);
-    const BU64().write(writer, amount);
-    const BU64().write(writer, capacity);
-    const BString().write(writer, mobility_type);
-    const BU64().write(writer, movement_speed);
-    const BU64().write(writer, arrives_at);
+    const BU64().write(writer, production_rate);
+    const BU64().write(writer, production_time);
+    const BU64().write(writer, awaiting_units);
+    const BU64().write(writer, claimed_at);
 
     return writer.toArray();
   }
@@ -40,22 +38,20 @@ class __AccountData extends _AccountData {
     required this.owner,
     required this.resourceId,
     required this.locationId,
-    required this.amount,
-    required this.capacity,
-    required this.mobility_type,
-    required this.movement_speed,
-    required this.arrives_at,
+    required this.production_rate,
+    required this.production_time,
+    required this.awaiting_units,
+    required this.claimed_at,
   }) : super._();
 
   final List<int> discriminator;
   final List<int> owner;
   final List<int> resourceId;
   final List<int> locationId;
-  final BigInt amount;
-  final BigInt capacity;
-  final String mobility_type;
-  final BigInt movement_speed;
-  final BigInt arrives_at;
+  final BigInt production_rate;
+  final BigInt production_time;
+  final BigInt awaiting_units;
+  final BigInt claimed_at;
 }
 
 class B_AccountData implements BType<_AccountData> {
@@ -73,11 +69,10 @@ class B_AccountData implements BType<_AccountData> {
       owner: const BFixedArray(32, BU8()).read(reader),
       resourceId: const BFixedArray(32, BU8()).read(reader),
       locationId: const BFixedArray(32, BU8()).read(reader),
-      amount: const BU64().read(reader),
-      capacity: const BU64().read(reader),
-      mobility_type: const BString().read(reader),
-      movement_speed: const BU64().read(reader),
-      arrives_at: const BU64().read(reader),
+      production_rate: const BU64().read(reader),
+      production_time: const BU64().read(reader),
+      awaiting_units: const BU64().read(reader),
+      claimed_at: const BU64().read(reader),
     );
   }
 }
