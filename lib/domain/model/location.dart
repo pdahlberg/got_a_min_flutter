@@ -1,0 +1,66 @@
+
+import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/infra/extension_methods.dart';
+
+class Location extends Item {
+
+  final String name;
+  final int position;
+  final int capacity;
+  final int occupiedSpace;
+
+  const Location(
+    super.id,
+    super.owner,
+    super.initialized,
+    super.timestamp,
+    this.name,
+    this.position,
+    this.capacity,
+    this.occupiedSpace,
+  );
+  //const Location.from(String name) : this(const ItemId.empty(), name, 0, null, false);
+  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0);
+
+  Location copyWith({
+    ItemId? id,
+    String? name,
+    int? timestamp,
+    Owner? owner,
+    bool? initialized,
+    int? position,
+    int? capacity,
+    int? occupiedSpace,
+  }) {
+    return Location(
+      id ?? this.id,
+      owner ?? this.owner,
+      initialized ?? this.initialized,
+      timestamp ?? this.timestamp,
+      name ?? this.name,
+      position ?? this.position,
+      capacity ?? this.capacity,
+      occupiedSpace ?? this.occupiedSpace,
+    );
+  }
+
+  @override
+  String label() => "$name @ $position [$occupiedSpace/$capacity] ${id.publicKey.toShortString()}";
+
+  @override
+  String toString() {
+    return 'Location{id: $id, name: $name, ${super.toStringProps()}}';
+  }
+
+  @override
+  List<Object?> get props => [
+    ...super.props,
+    name,
+    position,
+    capacity,
+    occupiedSpace,
+  ];
+
+}

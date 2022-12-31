@@ -26,11 +26,3 @@ class ItemAddressAskedFor extends ItemDetailsEvent {
   List<Object?> get props => [address];
 }
 
-class ItemInitialized extends ItemDetailsEvent {
-  final Item item;
-
-  const ItemInitialized(this.item);
-
-  @override
-  List<Object?> get props => [item];
-}
