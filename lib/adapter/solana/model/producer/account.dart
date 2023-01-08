@@ -4,8 +4,8 @@ import 'package:solana/dto.dart';
 import 'package:solana/solana.dart';
 
 part 'account.g.dart';
-class StorageAccount implements AnchorAccount {
-  const StorageAccount._({
+class ProducerAccount implements AnchorAccount {
+  const ProducerAccount._({
     required this.discriminator,
     required this.owner,
     required this.resourceId,
@@ -16,12 +16,12 @@ class StorageAccount implements AnchorAccount {
     required this.claimedAt,
   });
 
-  factory StorageAccount._fromBinary(
+  factory ProducerAccount._fromBinary(
       List<int> bytes,
       ) {
     final accountData = _AccountData.fromBorsh(Uint8List.fromList(bytes));
 
-    return StorageAccount._(
+    return ProducerAccount._(
       discriminator: accountData.discriminator,
       owner: Ed25519HDPublicKey(accountData.owner),
       resourceId: Ed25519HDPublicKey(accountData.resourceId),
@@ -33,9 +33,9 @@ class StorageAccount implements AnchorAccount {
     );
   }
 
-  factory StorageAccount.fromAccountData(AccountData accountData) {
+  factory ProducerAccount.fromAccountData(AccountData accountData) {
     if (accountData is BinaryAccountData) {
-      return StorageAccount._fromBinary(accountData.data);
+      return ProducerAccount._fromBinary(accountData.data);
     } else {
       throw const FormatException('invalid account data found');
     }
@@ -53,7 +53,7 @@ class StorageAccount implements AnchorAccount {
 
   @override
   String toString() {
-    return 'StorageAccount{discriminator: $discriminator, owner: $owner, resourceId: $resourceId, locationId: $locationId, productionRate: $productionRate, productionTime: $productionTime, awaitingUnits: $awaitingUnits, claimedAt: $claimedAt}';
+    return 'ProducerAccount{discriminator: $discriminator, owner: $owner, resourceId: $resourceId, locationId: $locationId, productionRate: $productionRate, productionTime: $productionTime, awaitingUnits: $awaitingUnits, claimedAt: $claimedAt}';
   }
 }
 

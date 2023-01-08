@@ -2,19 +2,22 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
+import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
-import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
+import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
-import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
-import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';
 
 import 'model/location/account.dart';
@@ -96,12 +99,32 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  Future<ProducerDto> fetchProducerAccount(Producer producer) async {
+    final decoded = await _fetchAccountInfo(producer.id.publicKey, ProducerAccount.fromAccountData);
+    return ProducerDto(
+      true,
+      decoded.name,
+      decoded.owner.toBase58(),
+    );
+  }
+
+  @override
   Future<ResourceDto> fetchResourceAccount(Resource resource) async {
     final decoded = await _fetchAccountInfo(resource.id.publicKey, ResourceAccount.fromAccountData);
     return ResourceDto(
       true,
       decoded.name,
       decoded.owner.toBase58(),
+    );
+  }
+
+  @override
+  Future<StorageDto> fetchStorageAccount(Storage storage) async {
+    final decoded = await _fetchAccountInfo(storage.id.publicKey, StorageAccount.fromAccountData);
+    return StorageDto(
+      true,
+      decoded.owner.toBase58(),
+      decoded.amount,
     );
   }
 
