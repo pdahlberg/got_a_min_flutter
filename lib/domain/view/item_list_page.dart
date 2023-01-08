@@ -7,7 +7,9 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
+import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
@@ -39,9 +41,15 @@ class ItemListPage extends StatelessWidget {
                         if(item.runtimeType == Location) {
                           final location = item as Location;
                           context.itemListBloc.add(LocationInitialized(location));
+                        } else if(item.runtimeType == Producer) {
+                          final producer = item as Producer;
+                          context.itemListBloc.add(ProducerInitialized(producer));
                         } else if(item.runtimeType == Resource) {
                           final resource = item as Resource;
                           context.itemListBloc.add(ResourceInitialized(resource));
+                        } else if(item.runtimeType == Storage) {
+                          final storage = item as Storage;
+                          context.itemListBloc.add(StorageInitialized(storage));
                         }
                       },
                       child: const Text("init"),
@@ -54,7 +62,9 @@ class ItemListPage extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               context.itemListBloc.add(const LocationCreated("Location 1", 1));
+              //context.itemListBloc.add(const ProducerCreated(1));
               context.itemListBloc.add(const ResourceCreated("Resource A"));
+              //context.itemListBloc.add(const StorageCreated(10));
             },
           ),
         );

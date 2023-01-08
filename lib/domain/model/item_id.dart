@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:got_a_min_flutter/infra/extension_methods.dart';
 import 'package:solana/solana.dart';
 
 class ItemId extends Equatable {
@@ -16,6 +17,11 @@ class ItemId extends Equatable {
       throw UnimplementedError("ItemId.keyPair is null");
     }
     return keyPair!.publicKey;
+  }
+
+  @override
+  String toString() {
+    return keyPair?.publicKey.toShortString() ?? "<ID:null>";
   }
 
   @override

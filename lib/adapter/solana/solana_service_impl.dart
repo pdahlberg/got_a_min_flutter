@@ -78,16 +78,30 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  initProducer(Producer producer) async {
+    await devAirdrop(producer.id.publicKey);
+
+    //await InvokeInitProducer(_solanaClient, _programId, producer.owner!).run(producer);
+  }
+
+  @override
   initResource(Resource resource) async {
     await devAirdrop(resource.id.publicKey);
 
-    await InvokeInitResource(_solanaClient, _programId, resource.owner!).run(resource);
+    await InvokeResourceCall(_solanaClient, _programId, resource.owner!).run(resource);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
   }
 
   @override
+  initStorage(Storage storage) async {
+    await devAirdrop(storage.id.publicKey);
+
+    //await InvokeInitStorage(_solanaClient, _programId, storage.owner!).run(storage);
+  }
+
+  @override
   Future<LocationDto> fetchLocationAccount(Location location) async {
-    final decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
+    final LocationAccount decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
       true,
       decoded.name,
@@ -100,17 +114,17 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   Future<ProducerDto> fetchProducerAccount(Producer producer) async {
-    final decoded = await _fetchAccountInfo(producer.id.publicKey, ProducerAccount.fromAccountData);
+    final ProducerAccount decoded = await _fetchAccountInfo(producer.id.publicKey, ProducerAccount.fromAccountData);
     return ProducerDto(
       true,
-      decoded.name,
       decoded.owner.toBase58(),
+      decoded.productionRate,
     );
   }
 
   @override
   Future<ResourceDto> fetchResourceAccount(Resource resource) async {
-    final decoded = await _fetchAccountInfo(resource.id.publicKey, ResourceAccount.fromAccountData);
+    final ResourceAccount decoded = await _fetchAccountInfo(resource.id.publicKey, ResourceAccount.fromAccountData);
     return ResourceDto(
       true,
       decoded.name,
@@ -120,11 +134,11 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   Future<StorageDto> fetchStorageAccount(Storage storage) async {
-    final decoded = await _fetchAccountInfo(storage.id.publicKey, StorageAccount.fromAccountData);
+    final StorageAccount decoded = await _fetchAccountInfo(storage.id.publicKey, StorageAccount.fromAccountData);
     return StorageDto(
       true,
       decoded.owner.toBase58(),
-      decoded.amount,
+      decoded.capacity,
     );
   }
 

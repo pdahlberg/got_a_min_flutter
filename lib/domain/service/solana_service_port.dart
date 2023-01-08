@@ -13,7 +13,11 @@ abstract class SolanaServicePort {
 
   initLocation(Location location);
 
+  initProducer(Producer producer);
+
   initResource(Resource resource);
+
+  initStorage(Storage storage);
 
   Future<LocationDto> fetchLocationAccount(Location location);
 

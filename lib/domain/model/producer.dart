@@ -6,14 +6,14 @@ import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
 class Producer extends Item {
 
-  final String name;
+  final int productionRate;
 
-  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.name);
-  const Producer.empty() : this(const ItemId.empty(), null, false, 0, "");
+  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.productionRate);
+  const Producer.empty() : this(const ItemId.empty(), null, false, 0, 0);
 
   Producer copyWith({
     ItemId? id,
-    String? name,
+    int? productionRate,
     int? timestamp,
     Owner? owner,
     bool? initialized,
@@ -23,23 +23,23 @@ class Producer extends Item {
       owner ?? this.owner,
       initialized ?? this.initialized,
       timestamp ?? this.timestamp,
-      name ?? this.name,
+      productionRate ?? this.productionRate,
     );
   }
 
   @override
-  String label() => "$name ${id.publicKey.toShortString()}";
+  String label() => "Producer ${id.publicKey.toShortString()}";
 
 
   @override
   String toString() {
-    return 'Producer{name: $name, ${super.toStringProps()}}';
+    return 'Producer{productionRate: $productionRate, ${super.toStringProps()}}';
   }
 
   @override
   List<Object?> get props => [
     ...super.props,
-    name,
+    productionRate,
   ];
 
 }

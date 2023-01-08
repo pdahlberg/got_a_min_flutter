@@ -7,16 +7,18 @@ import 'package:got_a_min_flutter/infra/extension_methods.dart';
 class Storage extends Item {
 
   final int amount;
+  final int capacity;
 
-  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.amount);
-  const Storage.empty() : this(const ItemId.empty(), null, false, 0, 0);
+  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.amount, this.capacity);
+  const Storage.empty() : this(const ItemId.empty(), null, false, 0, 0, 0);
 
   Storage copyWith({
     ItemId? id,
-    int? amount,
     int? timestamp,
     Owner? owner,
     bool? initialized,
+    int? amount,
+    int? capacity,
   }) {
     return Storage(
       id ?? this.id,
@@ -24,6 +26,7 @@ class Storage extends Item {
       initialized ?? this.initialized,
       timestamp ?? this.timestamp,
       amount ?? this.amount,
+      capacity ?? this.capacity,
     );
   }
 
@@ -40,6 +43,7 @@ class Storage extends Item {
   List<Object?> get props => [
     ...super.props,
     amount,
+    capacity,
   ];
 
 }

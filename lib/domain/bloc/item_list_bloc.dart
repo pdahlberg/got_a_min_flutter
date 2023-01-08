@@ -5,7 +5,9 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
+import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
@@ -24,8 +26,12 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     on<ItemListRefreshed>(_onRefresh);
     on<LocationCreated>(_onLocationCreated);
     on<LocationInitialized>(_onLocationInit);
+    on<ProducerCreated>(_onProducerCreated);
+    on<ProducerInitialized>(_onProducerInit);
     on<ResourceCreated>(_onResourceCreated);
     on<ResourceInitialized>(_onResourceInit);
+    on<StorageCreated>(_onStorageCreated);
+    on<StorageInitialized>(_onStorageInit);
   }
 
   ItemListBloc.of(BuildContext context) : this(
@@ -73,6 +79,39 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ItemListRefreshed());
   }
 
+  Future<void> _onProducerCreated(ProducerCreated event, Emitter<ItemListState> emit) async {
+    var nowMillis = _timeService.nowMillis();
+
+    final owner = await _solanaServicePort.getOwner();
+    final newItem = Producer(await ItemId.random(), owner, false, nowMillis, event.productionRate);
+    final saved = _itemRepository.save(newItem);
+
+    emit(state.copyWith(
+      items: [
+        ...state.items,
+        saved,
+      ],
+    ));
+
+    add(ProducerInitialized(newItem));
+  }
+
+  Future<void> _onProducerInit(ProducerInitialized event, Emitter<ItemListState> emit) async {
+    await _solanaServicePort.initProducer(event.producer);
+    final dto = await _solanaServicePort.fetchProducerAccount(event.producer);
+
+    final producer = event.producer.copyWith(
+      initialized: dto.initialized,
+      productionRate: dto.productionRate,
+    );
+
+    debugPrint("resinit: ${producer.initialized}, ${dto.initialized}");
+
+    _itemRepository.save(producer);
+
+    add(ItemListRefreshed());
+  }
+
   Future<void> _onResourceCreated(ResourceCreated event, Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
@@ -97,6 +136,39 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     final resource = event.resource.copyWith(
       name: dto.name,
       initialized: dto.initialized,
+    );
+
+    debugPrint("resinit: ${resource.initialized}, ${dto.initialized}");
+
+    _itemRepository.save(resource);
+
+    add(ItemListRefreshed());
+  }
+
+  Future<void> _onStorageCreated(StorageCreated event, Emitter<ItemListState> emit) async {
+    var nowMillis = _timeService.nowMillis();
+
+    final owner = await _solanaServicePort.getOwner();
+    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, 0, event.capacity);
+    final saved = _itemRepository.save(newItem);
+
+    emit(state.copyWith(
+      items: [
+        ...state.items,
+        saved,
+      ],
+    ));
+
+    add(StorageInitialized(newItem));
+  }
+
+  Future<void> _onStorageInit(StorageInitialized event, Emitter<ItemListState> emit) async {
+    await _solanaServicePort.initStorage(event.storage);
+    final dto = await _solanaServicePort.fetchStorageAccount(event.storage);
+
+    final resource = event.storage.copyWith(
+      initialized: dto.initialized,
+      amount: dto.amount,
     );
 
     debugPrint("resinit: ${resource.initialized}, ${dto.initialized}");
