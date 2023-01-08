@@ -6,6 +6,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
@@ -81,7 +82,8 @@ class SolanaServiceImpl extends SolanaServicePort {
   initProducer(Producer producer) async {
     await devAirdrop(producer.id.publicKey);
 
-    //await InvokeInitProducer(_solanaClient, _programId, producer.owner!).run(producer);
+    //await InvokeProducer(_solanaClient, _programId, producer.owner!).run(producer);
+    throw UnimplementedError();
   }
 
   @override
@@ -96,7 +98,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   initStorage(Storage storage) async {
     await devAirdrop(storage.id.publicKey);
 
-    //await InvokeInitStorage(_solanaClient, _programId, storage.owner!).run(storage);
+    await InvokeStorageCall(_solanaClient, _programId, storage.owner!).init(storage);
   }
 
   @override

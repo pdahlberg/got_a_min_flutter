@@ -46,11 +46,12 @@ class ResourceCreated extends ItemListEvent {
 }
 
 class StorageCreated extends ItemListEvent {
+  final Resource resource;
   final int capacity;
-  const StorageCreated(this.capacity);
+  const StorageCreated(this.resource, this.capacity);
 
   @override
-  List<Object?> get props => [capacity];
+  List<Object?> get props => [resource, capacity];
 }
 
 class ProducerInitialized extends ItemListEvent {

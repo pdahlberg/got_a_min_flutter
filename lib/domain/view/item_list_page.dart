@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
+import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
@@ -34,28 +35,7 @@ class ItemListPage extends StatelessWidget {
                 /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
-                subtitle: Row(
-                  children: [
-                    OutlinedButton(
-                      onPressed: item.initialized ? null : () {
-                        if(item.runtimeType == Location) {
-                          final location = item as Location;
-                          context.itemListBloc.add(LocationInitialized(location));
-                        } else if(item.runtimeType == Producer) {
-                          final producer = item as Producer;
-                          context.itemListBloc.add(ProducerInitialized(producer));
-                        } else if(item.runtimeType == Resource) {
-                          final resource = item as Resource;
-                          context.itemListBloc.add(ResourceInitialized(resource));
-                        } else if(item.runtimeType == Storage) {
-                          final storage = item as Storage;
-                          context.itemListBloc.add(StorageInitialized(storage));
-                        }
-                      },
-                      child: const Text("init"),
-                    ),
-                  ],
-                ),
+                subtitle: buildItemButtons(item, context),
               );
             },
           ),
@@ -64,11 +44,54 @@ class ItemListPage extends StatelessWidget {
               context.itemListBloc.add(const LocationCreated("Location 1", 1));
               //context.itemListBloc.add(const ProducerCreated(1));
               context.itemListBloc.add(const ResourceCreated("Resource A"));
-              //context.itemListBloc.add(const StorageCreated(10));
             },
           ),
         );
       }
+    );
+  }
+
+  Row buildItemButtons(Item item, BuildContext context) {
+    if(item.runtimeType == Resource) {
+      return Row(
+        children: [
+          OutlinedButton(
+            onPressed: item.initialized ? null : () {
+              final resource = item as Resource;
+              context.itemListBloc.add(ResourceInitialized(resource));
+            },
+            child: const Text("init"),
+          ),
+          OutlinedButton(
+            onPressed: item.initialized ? () {
+              final resource = item as Resource;
+              context.itemListBloc.add(StorageCreated(resource, 10));
+            } : null,
+            child: const Text("create storage"),
+          ),
+          // context.itemListBloc.add(const StorageCreated(10));
+        ],
+      );
+    }
+    return Row(
+      children: [
+        OutlinedButton(
+          onPressed: item.initialized ? null : () {
+            if(item.runtimeType == Location) {
+              final location = item as Location;
+              context.itemListBloc.add(LocationInitialized(location));
+            } else if(item.runtimeType == Producer) {
+              final producer = item as Producer;
+              context.itemListBloc.add(ProducerInitialized(producer));
+            } else if(item.runtimeType == Storage) {
+              final storage = item as Storage;
+              context.itemListBloc.add(StorageInitialized(storage));
+            }
+          },
+          child: const Text("init"),
+        ),
+        // context.itemListBloc.add(const StorageCreated(10));
+      ],
     );
   }
 

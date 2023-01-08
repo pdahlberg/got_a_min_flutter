@@ -35,16 +35,14 @@ class InvokeStorageCall extends InvokeBase<InitStorage> {
 
   InvokeStorageCall(super.client, super.programId, super.owner);
 
-  // init
-  /*init(Storage storage) async {
+  init(Storage storage) async {
     await send(
       method: 'init_storage',
       params: InitStorage(
-        name: storage.name,
-        input1: [],
-        input2: [],
-        input_amount1: BigInt.from(0),
-        input_amount2: BigInt.from(0),
+        resource_id: storage.resource.id.publicKey.toByteArray().toList(),
+        capacity: BigInt.from(storage.capacity),
+        mobility_type: "fixed",
+        movement_speed: BigInt.from(0),
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: storage.id.keyPair!.publicKey, isSigner: true),
@@ -55,6 +53,6 @@ class InvokeStorageCall extends InvokeBase<InitStorage> {
         owner.keyPair,
       ],
     );
-  }*/
+  }
 
 }
