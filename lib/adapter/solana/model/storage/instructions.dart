@@ -46,11 +46,12 @@ class InvokeStorageCall extends InvokeBase<InitStorage> {
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: true),
         //AccountMeta.writeable(pubKey: storage.resource.id.keyPair!.publicKey, isSigner: true),
-        //AccountMeta.writeable(pubKey: storage.location.id.keyPair!.publicKey, isSigner: true),
+        AccountMeta.writeable(pubKey: storage.location.id.keyPair!.publicKey, isSigner: true),
         AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
       ],
       signers: [
         entityKeyPair,
+        storage.location.id.keyPair!,
         owner.keyPair,
       ],
     );

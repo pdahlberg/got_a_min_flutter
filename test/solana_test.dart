@@ -117,6 +117,7 @@ void main() {
         ),
         accounts: <AccountMeta>[
           AccountMeta.writeable(pubKey: storage.publicKey, isSigner: true),
+          AccountMeta.writeable(pubKey: location.publicKey, isSigner: true),
           AccountMeta.writeable(pubKey: payer.publicKey, isSigner: true),
           AccountMeta.readonly(pubKey: Ed25519HDPublicKey.fromBase58(SystemProgram.programId), isSigner: false),
         ],
@@ -128,6 +129,7 @@ void main() {
       message: message,
       signers: [
         storage,
+        location,
         payer,
       ],
       commitment: Commitment.confirmed,
