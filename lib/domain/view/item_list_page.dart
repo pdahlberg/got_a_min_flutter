@@ -108,8 +108,8 @@ class ItemListPage extends StatelessWidget {
 
   buildToolbarButtons(BuildContext context, List<Item> items) {
     final setupNeeded = items.isEmpty;
-    final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).firstOrNull;
-    final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).firstOrNull;
+    final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).where((i) => i.initialized).firstOrNull;
+    final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).where((i) => i.initialized).firstOrNull;
     final canCreateStorage = existingLocation != null && existingResource != null;
 
     return Row(
