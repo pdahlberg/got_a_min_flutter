@@ -1,7 +1,9 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
+import 'package:got_a_min_flutter/domain/model/storage.dart';
 
 abstract class ItemListEvent extends Equatable {
   const ItemListEvent();
@@ -27,9 +29,39 @@ class LocationInitialized extends ItemListEvent {
   List<Object?> get props => [location];
 }
 
+class ProducerCreated extends ItemListEvent {
+  final int productionRate;
+  const ProducerCreated(this.productionRate);
+
+  @override
+  List<Object?> get props => [productionRate];
+}
+
 class ResourceCreated extends ItemListEvent {
   final String name;
   const ResourceCreated(this.name);
+
+  @override
+  List<Object?> get props => [name];
+}
+
+class StorageCreated extends ItemListEvent {
+  final Resource resource;
+  final Location location;
+  final int capacity;
+  const StorageCreated(this.resource, this.location, this.capacity);
+
+  @override
+  List<Object?> get props => [resource, location, capacity];
+}
+
+class ProducerInitialized extends ItemListEvent {
+  final Producer producer;
+
+  const ProducerInitialized(this.producer);
+
+  @override
+  List<Object?> get props => [producer];
 }
 
 class ResourceInitialized extends ItemListEvent {
@@ -39,5 +71,14 @@ class ResourceInitialized extends ItemListEvent {
 
   @override
   List<Object?> get props => [resource];
+}
+
+class StorageInitialized extends ItemListEvent {
+  final Storage storage;
+
+  const StorageInitialized(this.storage);
+
+  @override
+  List<Object?> get props => [storage];
 }
 

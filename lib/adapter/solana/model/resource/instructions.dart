@@ -26,10 +26,11 @@ class InitResource with _$InitResource implements WithToBorsh<InitResource> {
   factory InitResource.fromBorsh(Uint8List data) => _$InitResourceFromBorsh(data);
 }
 
-class InvokeInitResource extends InvokeBase<InitResource> {
+class InvokeResourceCall extends InvokeBase<InitResource> {
 
-  InvokeInitResource(super.client, super.programId, super.owner);
+  InvokeResourceCall(super.client, super.programId, super.owner);
 
+  // init
   run(Resource resource) async {
     await send(
       method: 'init_resource',

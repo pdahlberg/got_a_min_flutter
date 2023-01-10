@@ -1,0 +1,5 @@
+
+enum MobilityType {
+  fixed,
+  movable,
+}

@@ -129,3 +129,4 @@ app.*.map.json
 
 secrets.dart
 secrets/
+/local.properties
