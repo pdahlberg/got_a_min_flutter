@@ -19,6 +19,7 @@ class InitStorage with _$InitStorage implements WithToBorsh<InitStorage> {
   factory InitStorage({
     @BFixedArray(32, BU8()) required List<int> resource_id,
     @BU64() required BigInt capacity,
+    @BU8() required int mobility_type,
   }) = _InitStorage;
 
   InitStorage._();
@@ -40,7 +41,7 @@ class InvokeStorageCall extends InvokeBase<InitStorage> {
       params: InitStorage(
         resource_id: storage.resource.id.publicKey.toByteArray().toList(),
         capacity: BigInt.from(storage.capacity),
-        //mobility_type: 1,
+        mobility_type: 1,
         //movement_speed: BigInt.from(0),
       ),
       accounts: <AccountMeta>[

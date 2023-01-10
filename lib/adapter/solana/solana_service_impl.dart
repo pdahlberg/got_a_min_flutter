@@ -140,7 +140,9 @@ class SolanaServiceImpl extends SolanaServicePort {
     return StorageDto(
       true,
       decoded.owner.toBase58(),
+      decoded.amount,
       decoded.capacity,
+      decoded.mobilityType,
     );
   }
 

@@ -113,6 +113,7 @@ void main() {
           InitStorage(
             resource_id: location.publicKey.bytes,
             capacity: BigInt.from(100),
+            mobility_type: 0,
           ).toBorsh().toList(),
         ),
         accounts: <AccountMeta>[

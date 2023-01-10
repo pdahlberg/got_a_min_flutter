@@ -12,9 +12,10 @@ class Storage extends Item {
   final Location location;
   final int amount;
   final int capacity;
+  final int mobilityType;
 
-  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity);
-  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0);
+  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType);
+  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0);
 
   Storage copyWith({
     ItemId? id,
@@ -25,6 +26,7 @@ class Storage extends Item {
     Location? location,
     int? amount,
     int? capacity,
+    int? mobilityType,
   }) {
     return Storage(
       id ?? this.id,
@@ -35,11 +37,12 @@ class Storage extends Item {
       location ?? this.location,
       amount ?? this.amount,
       capacity ?? this.capacity,
+      mobilityType ?? this.mobilityType,
     );
   }
 
   @override
-  String label() => "Storage ${id.publicKey.toShortString()}";
+  String label() => "Storage ${id.publicKey.toShortString()}, cap=$capacity, mt=$mobilityType";
 
 
   @override
@@ -54,6 +57,7 @@ class Storage extends Item {
     location,
     amount,
     capacity,
+    mobilityType,
   ];
 
 }

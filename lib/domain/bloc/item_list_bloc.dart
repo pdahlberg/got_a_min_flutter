@@ -151,7 +151,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     var nowMillis = _timeService.nowMillis();
 
     final owner = await _solanaServicePort.getOwner();
-    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity);
+    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity, 1);
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -171,6 +171,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     final storage = event.storage.copyWith(
       initialized: dto.initialized,
       amount: dto.amount,
+      capacity: dto.capacity,
+      mobilityType: dto.mobilityType,
     );
 
     debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");
