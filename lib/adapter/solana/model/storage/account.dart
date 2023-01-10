@@ -29,7 +29,7 @@ class StorageAccount implements AnchorAccount {
       locationId: Ed25519HDPublicKey(accountData.locationId),
       amount: accountData.amount.toInt(),
       capacity: accountData.capacity.toInt(),
-      mobilityType: accountData.mobility_type.toString(),
+      mobilityType: accountData.mobility_type.toInt(),
       movementSpeed: accountData.movement_speed.toInt(),
       arrivesAt: accountData.arrives_at.toInt(),
     );
@@ -50,7 +50,7 @@ class StorageAccount implements AnchorAccount {
   final Ed25519HDPublicKey locationId;
   final int amount;
   final int capacity;
-  final String mobilityType;
+  final int mobilityType;
   final int movementSpeed;
   final int arrivesAt;
 
@@ -79,7 +79,7 @@ class _AccountData with _$_AccountData {
     @BFixedArray(32, BU8()) required List<int> locationId,
     @BU64() required BigInt amount,
     @BU64() required BigInt capacity,
-    @BString() required String mobility_type,
+    @BU8() required int mobility_type,
     @BU64() required BigInt movement_speed,
     @BU64() required BigInt arrives_at,
   }) = __AccountData;

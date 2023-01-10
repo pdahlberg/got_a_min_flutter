@@ -27,7 +27,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   static const devnetRpcUrl = 'http://127.0.0.1:8899';
   static const devnetWebsocketUrl = 'ws://127.0.0.1:8900';
-  static final _programId = Ed25519HDPublicKey.fromBase58(
+  static final programId = Ed25519HDPublicKey.fromBase58(
     '3113AWybUqHaSKaEmUXnUFwXu4EUp1VDpqQFCvY7oajN',
   );
   final TimeService _timeService;
@@ -74,7 +74,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   initLocation(Location location) async {
     await devAirdrop(location.id.publicKey);
 
-    await InvokeInitLocation(_solanaClient, _programId, location.owner!).run(location);
+    await InvokeInitLocation(_solanaClient, programId, location.owner!).run(location);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
   }
 
@@ -90,7 +90,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   initResource(Resource resource) async {
     await devAirdrop(resource.id.publicKey);
 
-    await InvokeResourceCall(_solanaClient, _programId, resource.owner!).run(resource);
+    await InvokeResourceCall(_solanaClient, programId, resource.owner!).run(resource);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
   }
 
@@ -98,7 +98,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   initStorage(Storage storage) async {
     await devAirdrop(storage.id.publicKey);
 
-    await InvokeStorageCall(_solanaClient, _programId, storage.owner!).init(storage);
+    await InvokeStorageCall(_solanaClient, programId, storage.owner!).init(storage);
   }
 
   @override

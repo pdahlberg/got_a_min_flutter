@@ -13,6 +13,7 @@ import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
+import 'package:collection/collection.dart';
 
 class ItemListPage extends StatelessWidget {
 
@@ -26,17 +27,27 @@ class ItemListPage extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           body: ListView.builder(
-            itemCount: state.items.length,
+            itemCount: state.items.length + 1,
             itemBuilder: (BuildContext context, int index) {
-              final item = state.items[index];
-              debugPrint("$item");
-              return ListTile(
-                title: Text(item.label()),
-                /*onTap: () {
+              if(index < state.items.length) {
+                final item = state.items[index];
+                debugPrint("$item");
+                return ListTile(
+                  title: Text(item.label()),
+                  /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
-                subtitle: buildItemButtons(item, context),
-              );
+                  subtitle: buildItemButtons(context, item),
+                );
+              } else {
+                return ListTile(
+                  title: Text("Toolbar"),
+                  /*onTap: () {
+                  router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
+                },*/
+                  subtitle: buildToolbarButtons(context, state.items),
+                );
+              }
             },
           ),
           floatingActionButton: FloatingActionButton(
@@ -51,7 +62,7 @@ class ItemListPage extends StatelessWidget {
     );
   }
 
-  Row buildItemButtons(Item item, BuildContext context) {
+  Row buildItemButtons(BuildContext context, Item item) {
     if(item.runtimeType == Resource) {
       return Row(
         children: [
@@ -62,13 +73,13 @@ class ItemListPage extends StatelessWidget {
             },
             child: const Text("init"),
           ),
-          OutlinedButton(
+          /*OutlinedButton(
             onPressed: item.initialized ? () {
               final resource = item as Resource;
               context.itemListBloc.add(StorageCreated(resource, 10));
             } : null,
             child: const Text("create storage"),
-          ),
+          ),*/
           // context.itemListBloc.add(const StorageCreated(10));
         ],
       );
@@ -89,6 +100,33 @@ class ItemListPage extends StatelessWidget {
             }
           },
           child: const Text("init"),
+        ),
+        // context.itemListBloc.add(const StorageCreated(10));
+      ],
+    );
+  }
+
+  buildToolbarButtons(BuildContext context, List<Item> items) {
+    final setupNeeded = items.isEmpty;
+    final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).firstOrNull;
+    final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).firstOrNull;
+    final canCreateStorage = existingLocation != null && existingResource != null;
+
+    return Row(
+      children: [
+        OutlinedButton(
+          onPressed: setupNeeded ? () {
+            context.itemListBloc.add(const LocationCreated("Location 1", 1));
+            //context.itemListBloc.add(const ProducerCreated(1));
+            context.itemListBloc.add(const ResourceCreated("Resource A"));
+          } : null,
+          child: const Text("Setup"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateStorage ? () {
+            context.itemListBloc.add(StorageCreated(existingResource, existingLocation, 10));
+          } : null,
+          child: const Text("Create Storage"),
         ),
         // context.itemListBloc.add(const StorageCreated(10));
       ],

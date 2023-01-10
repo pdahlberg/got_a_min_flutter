@@ -58,6 +58,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
           saved,
         ],
     ));
+
+    add(LocationInitialized(newItem));
   }
 
   Future<void> _onLocationInit(LocationInitialized event, Emitter<ItemListState> emit) async {
@@ -149,7 +151,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     var nowMillis = _timeService.nowMillis();
 
     final owner = await _solanaServicePort.getOwner();
-    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, 0, event.capacity);
+    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity);
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -166,14 +168,14 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     await _solanaServicePort.initStorage(event.storage);
     final dto = await _solanaServicePort.fetchStorageAccount(event.storage);
 
-    final resource = event.storage.copyWith(
+    final storage = event.storage.copyWith(
       initialized: dto.initialized,
       amount: dto.amount,
     );
 
-    debugPrint("resinit: ${resource.initialized}, ${dto.initialized}");
+    debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");
 
-    _itemRepository.save(resource);
+    _itemRepository.save(storage);
 
     add(ItemListRefreshed());
   }

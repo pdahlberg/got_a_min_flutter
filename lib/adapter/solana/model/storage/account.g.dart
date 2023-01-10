@@ -13,7 +13,7 @@ mixin _$_AccountData {
   List<int> get locationId => throw UnimplementedError();
   BigInt get amount => throw UnimplementedError();
   BigInt get capacity => throw UnimplementedError();
-  String get mobility_type => throw UnimplementedError();
+  int get mobility_type => throw UnimplementedError();
   BigInt get movement_speed => throw UnimplementedError();
   BigInt get arrives_at => throw UnimplementedError();
 
@@ -26,7 +26,7 @@ mixin _$_AccountData {
     const BFixedArray(32, BU8()).write(writer, locationId);
     const BU64().write(writer, amount);
     const BU64().write(writer, capacity);
-    const BString().write(writer, mobility_type);
+    const BU8().write(writer, mobility_type);
     const BU64().write(writer, movement_speed);
     const BU64().write(writer, arrives_at);
 
@@ -53,7 +53,7 @@ class __AccountData extends _AccountData {
   final List<int> locationId;
   final BigInt amount;
   final BigInt capacity;
-  final String mobility_type;
+  final int mobility_type;
   final BigInt movement_speed;
   final BigInt arrives_at;
 }
@@ -75,7 +75,7 @@ class B_AccountData implements BType<_AccountData> {
       locationId: const BFixedArray(32, BU8()).read(reader),
       amount: const BU64().read(reader),
       capacity: const BU64().read(reader),
-      mobility_type: const BString().read(reader),
+      mobility_type: const BU8().read(reader),
       movement_speed: const BU64().read(reader),
       arrives_at: const BU64().read(reader),
     );
