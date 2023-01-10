@@ -114,6 +114,7 @@ void main() {
             resource_id: location.publicKey.bytes,
             capacity: BigInt.from(100),
             mobility_type: 0,
+            movement_speed: BigInt.from(0),
           ).toBorsh().toList(),
         ),
         accounts: <AccountMeta>[
