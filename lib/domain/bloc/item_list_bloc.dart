@@ -5,6 +5,7 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -151,7 +152,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     var nowMillis = _timeService.nowMillis();
 
     final owner = await _solanaServicePort.getOwner();
-    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity, 1);
+    final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity, MobilityType.movable);
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -172,7 +173,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       initialized: dto.initialized,
       amount: dto.amount,
       capacity: dto.capacity,
-      mobilityType: dto.mobilityType,
+      mobilityType: dto.getMobilityType(),
     );
 
     debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");

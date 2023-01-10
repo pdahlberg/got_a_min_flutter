@@ -2,6 +2,7 @@
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
@@ -12,10 +13,10 @@ class Storage extends Item {
   final Location location;
   final int amount;
   final int capacity;
-  final int mobilityType;
+  final MobilityType mobilityType;
 
   const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType);
-  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0);
+  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, MobilityType.fixed);
 
   Storage copyWith({
     ItemId? id,
@@ -26,7 +27,7 @@ class Storage extends Item {
     Location? location,
     int? amount,
     int? capacity,
-    int? mobilityType,
+    MobilityType? mobilityType,
   }) {
     return Storage(
       id ?? this.id,

@@ -1,5 +1,6 @@
 
 import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
 
 class StorageDto {
 
@@ -16,5 +17,13 @@ class StorageDto {
     this.capacity,
     this.mobilityType
   );
+
+  MobilityType getMobilityType() {
+    switch(mobilityType) {
+      case 0: return MobilityType.fixed;
+      case 1: return MobilityType.movable;
+      default: return MobilityType.fixed;
+    }
+  }
 
 }
