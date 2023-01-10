@@ -7,11 +7,13 @@ part of 'instructions.dart';
 // **************************************************************************
 
 mixin _$InitStorage {
+  List<int> get resource_id => throw UnimplementedError();
   BigInt get capacity => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
 
+    const BFixedArray(32, BU8()).write(writer, resource_id);
     const BU64().write(writer, capacity);
 
     return writer.toArray();
@@ -20,9 +22,11 @@ mixin _$InitStorage {
 
 class _InitStorage extends InitStorage {
   _InitStorage({
+    required this.resource_id,
     required this.capacity,
   }) : super._();
 
+  final List<int> resource_id;
   final BigInt capacity;
 }
 
@@ -37,6 +41,7 @@ class BInitStorage implements BType<InitStorage> {
   @override
   InitStorage read(BinaryReader reader) {
     return InitStorage(
+      resource_id: const BFixedArray(32, BU8()).read(reader),
       capacity: const BU64().read(reader),
     );
   }

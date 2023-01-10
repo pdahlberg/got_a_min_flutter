@@ -17,6 +17,7 @@ movement_speed: i64,
 @BorshSerializable()
 class InitStorage with _$InitStorage implements WithToBorsh<InitStorage> {
   factory InitStorage({
+    @BFixedArray(32, BU8()) required List<int> resource_id,
     @BU64() required BigInt capacity,
   }) = _InitStorage;
 
@@ -37,7 +38,7 @@ class InvokeStorageCall extends InvokeBase<InitStorage> {
     await send(
       method: 'init_storage',
       params: InitStorage(
-        //resource_id: storage.resource.id.publicKey.toByteArray().toList(),
+        resource_id: storage.resource.id.publicKey.toByteArray().toList(),
         capacity: BigInt.from(storage.capacity),
         //mobility_type: 1,
         //movement_speed: BigInt.from(0),

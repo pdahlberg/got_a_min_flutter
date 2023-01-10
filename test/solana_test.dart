@@ -111,6 +111,7 @@ void main() {
         method: 'init_storage',
         arguments: ByteArray(
           InitStorage(
+            resource_id: location.publicKey.bytes,
             capacity: BigInt.from(100),
           ).toBorsh().toList(),
         ),
