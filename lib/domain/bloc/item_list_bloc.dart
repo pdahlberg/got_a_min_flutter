@@ -10,6 +10,7 @@ import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
+import 'package:got_a_min_flutter/domain/persistence/storage_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
 
@@ -18,11 +19,13 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   final TimeService _timeService;
   final ItemRepository _itemRepository;
   final SolanaServicePort _solanaServicePort;
+  final StorageRepository _storageRepository;
 
   ItemListBloc(
       this._timeService,
       this._itemRepository,
       this._solanaServicePort,
+      this._storageRepository,
   ) : super(const ItemListState()) {
     on<ItemListRefreshed>(_onRefresh);
     on<LocationCreated>(_onLocationCreated);
@@ -38,6 +41,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   }
 
   ItemListBloc.of(BuildContext context) : this(
+    context.read(),
     context.read(),
     context.read(),
     context.read(),
@@ -127,8 +131,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
   Future<void> _onProductionStarted(ProductionStarted event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.produce(event.producer, event.storage);
-    await _solanaServicePort.fetchStorageAccount(event.storage);
-    add(ItemListRefreshed());
+    add(StorageRefreshed(event.storage));
   }
 
   Future<void> _onResourceCreated(ResourceCreated event, Emitter<ItemListState> emit) async {
@@ -170,7 +173,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
     final owner = await _solanaServicePort.getOwner();
     final newItem = Storage(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, 0, event.capacity, MobilityType.movable, 1);
-    final saved = _itemRepository.save(newItem);
+    final saved = _storageRepository.save(newItem);
 
     emit(state.copyWith(
       items: [
@@ -201,7 +204,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
     debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");
 
-    _itemRepository.save(storage);
+    _storageRepository.save(storage);
 
     add(ItemListRefreshed());
   }
