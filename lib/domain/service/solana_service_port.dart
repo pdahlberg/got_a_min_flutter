@@ -15,6 +15,8 @@ abstract class SolanaServicePort {
 
   initProducer(Producer producer);
 
+  produce(Producer producer, Storage storage);
+
   initResource(Resource resource);
 
   initStorage(Storage storage);

@@ -38,7 +38,9 @@ class ItemRepository {
   }
 
   List<Item> findAll() {
-    return db.values.toList();
+    final List<Item> result = [];
+    result.addAll(db.values);
+    return result;
   }
 
   Item? findByAddress(String address) {

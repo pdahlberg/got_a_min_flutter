@@ -87,6 +87,14 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  produce(Producer producer, Storage storage) async {
+    await InvokeProducerCall(_solanaClient, programId, producer.owner!).produce(producer, storage);
+    final result1 = await fetchProducerAccount(producer);
+    final result2 = await fetchStorageAccount(storage);
+    debugPrint("SolanaService.produce: $result1 & $result2");
+  }
+
+  @override
   initResource(Resource resource) async {
     await devAirdrop(resource.id.publicKey);
 
@@ -124,6 +132,8 @@ class SolanaServiceImpl extends SolanaServicePort {
       decoded.locationId.toBase58(),
       decoded.productionRate,
       decoded.productionTime,
+      decoded.awaitingUnits,
+      decoded.claimedAt,
     );
   }
 

@@ -46,7 +46,7 @@ class Storage extends Item {
   }
 
   @override
-  String label() => "Storage ${id.publicKey.toShortString()}, cap=$capacity, mt=$mobilityType, spd=$movementSpeed";
+  String label() => "${resource.name} storage amount=$amount, mt=$mobilityType, spd=$movementSpeed";
 
 
   @override

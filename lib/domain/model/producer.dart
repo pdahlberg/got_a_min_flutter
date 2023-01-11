@@ -16,6 +16,8 @@ class Producer extends Item {
   const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime);
   const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0);
 
+  bool get readyToProduce => initialized; // Should include storage
+
   Producer copyWith({
     ItemId? id,
     int? timestamp,
@@ -39,7 +41,7 @@ class Producer extends Item {
   }
 
   @override
-  String label() => "Producer ${id.publicKey.toShortString()}";
+  String label() => "${resource.name} producer";
 
 
   @override

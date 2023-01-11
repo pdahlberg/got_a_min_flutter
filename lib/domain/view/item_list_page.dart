@@ -37,7 +37,7 @@ class ItemListPage extends StatelessWidget {
                   /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
-                  subtitle: buildItemButtons(context, item),
+                  subtitle: buildItemButtons(context, item, state.items),
                 );
               } else {
                 return ListTile(
@@ -62,9 +62,11 @@ class ItemListPage extends StatelessWidget {
     );
   }
 
-  Row buildItemButtons(BuildContext context, Item item) {
+  Row buildItemButtons(BuildContext context, Item item, List<Item> items) {
     if(item.runtimeType == Producer) {
       final producer = item as Producer;
+      final existingStorage = items.where((i) => i.runtimeType == Storage).map((i) => i as Storage).where((i) => i.initialized).firstOrNull;
+
       return Row(
         children: [
           OutlinedButton(
@@ -72,6 +74,12 @@ class ItemListPage extends StatelessWidget {
               context.itemListBloc.add(ProducerInitialized(producer));
             },
             child: const Text("init"),
+          ),
+          OutlinedButton(
+            onPressed: item.readyToProduce && existingStorage != null ? () {
+              context.itemListBloc.add(ProductionStarted(producer, existingStorage));
+            } : null,
+            child: Text("produce ${producer.resource.name}"),
           ),
         ],
       );

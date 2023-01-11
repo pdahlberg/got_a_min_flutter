@@ -29,10 +29,12 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     on<LocationInitialized>(_onLocationInit);
     on<ProducerCreated>(_onProducerCreated);
     on<ProducerInitialized>(_onProducerInit);
+    on<ProductionStarted>(_onProductionStarted);
     on<ResourceCreated>(_onResourceCreated);
     on<ResourceInitialized>(_onResourceInit);
     on<StorageCreated>(_onStorageCreated);
     on<StorageInitialized>(_onStorageInit);
+    on<StorageRefreshed>(_onStorageRefresh);
   }
 
   ItemListBloc.of(BuildContext context) : this(
@@ -42,7 +44,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   );
   
   Future<void> _onRefresh(ItemListRefreshed event, Emitter<ItemListState> emit) async {
-
+    //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
     emit(state.copyWith(items: _itemRepository.findAll()));
   }
 
@@ -73,6 +75,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       capacity: dto.capacity,
       occupiedSpace: dto.occupiedSpace,
       initialized: dto.initialized,
+      timestamp: _timeService.nowMillis(),
     );
 
     debugPrint("locinit: ${location.initialized}, ${dto.initialized}");
@@ -112,12 +115,19 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       location: location,
       productionRate: dto.productionRate,
       productionTime: dto.productionTime,
+      timestamp: _timeService.nowMillis(),
     );
 
     debugPrint("resinit: ${producer.initialized}, ${dto.initialized}");
 
     _itemRepository.save(producer);
 
+    add(ItemListRefreshed());
+  }
+
+  Future<void> _onProductionStarted(ProductionStarted event, Emitter<ItemListState> emit) async {
+    await _solanaServicePort.produce(event.producer, event.storage);
+    await _solanaServicePort.fetchStorageAccount(event.storage);
     add(ItemListRefreshed());
   }
 
@@ -145,6 +155,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     final resource = event.resource.copyWith(
       name: dto.name,
       initialized: dto.initialized,
+      timestamp: _timeService.nowMillis(),
     );
 
     debugPrint("resinit: ${resource.initialized}, ${dto.initialized}");
@@ -173,6 +184,11 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
   Future<void> _onStorageInit(StorageInitialized event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.initStorage(event.storage);
+
+    add(StorageRefreshed(event.storage));
+  }
+
+  Future<void> _onStorageRefresh(StorageRefreshed event, Emitter<ItemListState> emit) async {
     final dto = await _solanaServicePort.fetchStorageAccount(event.storage);
 
     final storage = event.storage.copyWith(
@@ -180,6 +196,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       amount: dto.amount,
       capacity: dto.capacity,
       mobilityType: dto.getMobilityType(),
+      timestamp: _timeService.nowMillis(),
     );
 
     debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");

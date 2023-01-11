@@ -16,15 +16,20 @@ class InvokeBase<T> {
 
   Future<String> send({
     required String method,
-    required WithToBorsh<T> params,
+    WithToBorsh<T>? params,
     required List<AccountMeta> accounts,
     required List<Ed25519HDKeyPair> signers,
   }) async {
+    var args = const ByteArray.empty();
+    if(params != null) {
+      args = ByteArray(params.toBorsh().toList());
+    }
+
     final instructions = [
       await AnchorInstruction.forMethod(
         programId: programId,
         method: method,
-        arguments: ByteArray(params.toBorsh().toList()),
+        arguments: args,
         accounts: [
           ...accounts,
           AccountMeta.readonly(pubKey: Ed25519HDPublicKey.fromBase58(SystemProgram.programId), isSigner: false),

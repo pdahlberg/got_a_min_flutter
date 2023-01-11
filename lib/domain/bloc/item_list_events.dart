@@ -67,6 +67,16 @@ class ProducerInitialized extends ItemListEvent {
   List<Object?> get props => [producer];
 }
 
+class ProductionStarted extends ItemListEvent {
+  final Producer producer;
+  final Storage storage;
+
+  const ProductionStarted(this.producer, this.storage);
+
+  @override
+  List<Object?> get props => [producer, storage];
+}
+
 class ResourceInitialized extends ItemListEvent {
   final Resource resource;
 
@@ -80,6 +90,15 @@ class StorageInitialized extends ItemListEvent {
   final Storage storage;
 
   const StorageInitialized(this.storage);
+
+  @override
+  List<Object?> get props => [storage];
+}
+
+class StorageRefreshed extends ItemListEvent {
+  final Storage storage;
+
+  const StorageRefreshed(this.storage);
 
   @override
   List<Object?> get props => [storage];
