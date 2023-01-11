@@ -30,11 +30,14 @@ class LocationInitialized extends ItemListEvent {
 }
 
 class ProducerCreated extends ItemListEvent {
+  final Resource resource;
+  final Location location;
   final int productionRate;
-  const ProducerCreated(this.productionRate);
+  final int productionTime;
+  const ProducerCreated(this.resource, this.location, this.productionRate, this.productionTime);
 
   @override
-  List<Object?> get props => [productionRate];
+  List<Object?> get props => [resource, location, productionRate, productionTime];
 }
 
 class ResourceCreated extends ItemListEvent {

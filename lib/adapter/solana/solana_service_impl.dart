@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/producer/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
@@ -82,8 +83,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   initProducer(Producer producer) async {
     await devAirdrop(producer.id.publicKey);
 
-    //await InvokeProducer(_solanaClient, _programId, producer.owner!).run(producer);
-    throw UnimplementedError();
+    await InvokeProducerCall(_solanaClient, programId, producer.owner!).init(producer);
   }
 
   @override
@@ -120,7 +120,10 @@ class SolanaServiceImpl extends SolanaServicePort {
     return ProducerDto(
       true,
       decoded.owner.toBase58(),
+      decoded.resourceId.toBase58(),
+      decoded.locationId.toBase58(),
       decoded.productionRate,
+      decoded.productionTime,
     );
   }
 

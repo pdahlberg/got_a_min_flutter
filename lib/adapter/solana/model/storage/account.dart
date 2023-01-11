@@ -4,6 +4,7 @@ import 'package:solana/dto.dart';
 import 'package:solana/solana.dart';
 
 part 'account.g.dart';
+
 class StorageAccount implements AnchorAccount {
   const StorageAccount._({
     required this.discriminator,

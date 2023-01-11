@@ -86,7 +86,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     var nowMillis = _timeService.nowMillis();
 
     final owner = await _solanaServicePort.getOwner();
-    final newItem = Producer(await ItemId.random(), owner, false, nowMillis, event.productionRate);
+    final newItem = Producer(await ItemId.random(), owner, false, nowMillis, event.resource, event.location, event.productionRate, event.productionTime);
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -100,19 +100,25 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   }
 
   Future<void> _onProducerInit(ProducerInitialized event, Emitter<ItemListState> emit) async {
-    /*await _solanaServicePort.initProducer(event.producer);
+    await _solanaServicePort.initProducer(event.producer);
     final dto = await _solanaServicePort.fetchProducerAccount(event.producer);
+
+    final resource = _itemRepository.findByAddress(dto.resourceId) as Resource;
+    final location = _itemRepository.findByAddress(dto.locationId) as Location;
 
     final producer = event.producer.copyWith(
       initialized: dto.initialized,
+      resource: resource,
+      location: location,
       productionRate: dto.productionRate,
+      productionTime: dto.productionTime,
     );
 
     debugPrint("resinit: ${producer.initialized}, ${dto.initialized}");
 
     _itemRepository.save(producer);
 
-    add(ItemListRefreshed());*/
+    add(ItemListRefreshed());
   }
 
   Future<void> _onResourceCreated(ResourceCreated event, Emitter<ItemListState> emit) async {

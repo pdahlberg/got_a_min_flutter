@@ -63,7 +63,19 @@ class ItemListPage extends StatelessWidget {
   }
 
   Row buildItemButtons(BuildContext context, Item item) {
-    if(item.runtimeType == Resource) {
+    if(item.runtimeType == Producer) {
+      final producer = item as Producer;
+      return Row(
+        children: [
+          OutlinedButton(
+            onPressed: item.initialized ? null : () {
+              context.itemListBloc.add(ProducerInitialized(producer));
+            },
+            child: const Text("init"),
+          ),
+        ],
+      );
+    } else if(item.runtimeType == Resource) {
       return Row(
         children: [
           OutlinedButton(
@@ -73,14 +85,6 @@ class ItemListPage extends StatelessWidget {
             },
             child: const Text("init"),
           ),
-          /*OutlinedButton(
-            onPressed: item.initialized ? () {
-              final resource = item as Resource;
-              context.itemListBloc.add(StorageCreated(resource, 10));
-            } : null,
-            child: const Text("create storage"),
-          ),*/
-          // context.itemListBloc.add(const StorageCreated(10));
         ],
       );
     }
@@ -121,6 +125,12 @@ class ItemListPage extends StatelessWidget {
             context.itemListBloc.add(const ResourceCreated("Resource A"));
           } : null,
           child: const Text("Setup"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateStorage ? () {
+            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 1));
+          } : null,
+          child: const Text("Create Producer"),
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
