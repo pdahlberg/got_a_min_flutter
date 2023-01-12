@@ -46,12 +46,12 @@ class Storage extends Item {
   }
 
   @override
-  String label() => "${resource.name} storage amount=$amount, mt=$mobilityType, spd=$movementSpeed";
+  String label() => "Storage(${resource.name}) amount=$amount, mt=$mobilityType, spd=$movementSpeed";
 
 
   @override
   String toString() {
-    return 'Resource{amount: $amount, ${super.toStringProps()}}';
+    return 'Storage{amount: $amount, ${super.toStringProps()}}';
   }
 
   @override

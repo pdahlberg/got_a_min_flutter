@@ -12,9 +12,10 @@ class Producer extends Item {
   final Location location;
   final int productionRate;
   final int productionTime;
+  final int awaitingUnits;
 
-  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime);
-  const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0);
+  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime, this.awaitingUnits);
+  const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0);
 
   bool get readyToProduce => initialized; // Should include storage
 
@@ -27,6 +28,7 @@ class Producer extends Item {
     Location? location,
     int? productionRate,
     int? productionTime,
+    int? awaitingUnits,
   }) {
     return Producer(
       id ?? this.id,
@@ -37,16 +39,16 @@ class Producer extends Item {
       location ?? this.location,
       productionRate ?? this.productionRate,
       productionTime ?? this.productionTime,
+        awaitingUnits ?? this.awaitingUnits,
     );
   }
 
   @override
-  String label() => "${resource.name} producer";
-
+  String label() => "${resource.name} producer (waiting: $awaitingUnits)";
 
   @override
   String toString() {
-    return 'Producer{productionRate: $productionRate, ${super.toStringProps()}}';
+    return 'Producer{productionRate: $productionRate, waiting($awaitingUnits), ${super.toStringProps()}}';
   }
 
   @override
@@ -55,6 +57,7 @@ class Producer extends Item {
     resource,
     productionRate,
     productionTime,
+    awaitingUnits,
   ];
 
 }

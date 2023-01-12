@@ -104,3 +104,14 @@ class StorageRefreshed extends ItemListEvent {
   List<Object?> get props => [storage];
 }
 
+class HeartbeatEnabled extends ItemListEvent {
+  final bool enabled;
+
+  const HeartbeatEnabled(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+
+

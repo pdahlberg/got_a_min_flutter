@@ -2,6 +2,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
@@ -38,11 +40,20 @@ class StorageRepository {
     }
   }
 
-  /*List<Storage> findAll() {
-    final List<Storage> result = [];
-    result.addAll(db.values);
-    return result;
-  }*/
+  List<Storage> findAll() {
+    return _itemRepository
+        .findAll()
+        .where((item) => item.runtimeType == Storage)
+        .map((item) => item as Storage)
+        .toList();
+  }
+
+  List<Storage> findByLocationAndResource(Location location, Resource resource) {
+    return findAll()
+        .where((p) => p.location.id == location.id)
+        .where((p) => p.resource.id == resource.id)
+        .toList();
+  }
 
   /*Storage? findByAddress(String address) {
     StorageId? id;

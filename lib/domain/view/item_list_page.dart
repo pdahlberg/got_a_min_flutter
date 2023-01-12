@@ -41,7 +41,7 @@ class ItemListPage extends StatelessWidget {
                 );
               } else {
                 return ListTile(
-                  title: Text("Toolbar"),
+                  title: const Text("Toolbar"),
                   /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
@@ -127,6 +127,12 @@ class ItemListPage extends StatelessWidget {
     return Row(
       children: [
         OutlinedButton(
+          onPressed: () {
+            context.itemListBloc.add(const HeartbeatEnabled(true));
+          },
+          child: const Text("Toggle Heartbeat"),
+        ),
+        OutlinedButton(
           onPressed: setupNeeded ? () {
             context.itemListBloc.add(const LocationCreated("Location 1", 1));
             //context.itemListBloc.add(const ProducerCreated(1));
@@ -136,7 +142,7 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 1));
+            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 30));
           } : null,
           child: const Text("Create Producer"),
         ),
