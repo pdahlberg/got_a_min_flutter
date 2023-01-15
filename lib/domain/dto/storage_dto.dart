@@ -26,4 +26,9 @@ class StorageDto {
     }
   }
 
+  @override
+  String toString() {
+    return 'StorageDto{initialized: $initialized, owner: $owner, amount: $amount, capacity: $capacity, mobilityType: $mobilityType}';
+  }
+  
 }

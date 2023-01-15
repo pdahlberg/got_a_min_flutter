@@ -9,6 +9,8 @@ class ProducerDto {
   final String locationId;
   final int productionRate;
   final int productionTime;
+  final int awaitingUnits;
+  final int claimedAt;
 
   ProducerDto(
     this.initialized,
@@ -17,7 +19,12 @@ class ProducerDto {
     this.locationId,
     this.productionRate,
     this.productionTime,
+    this.awaitingUnits,
+    this.claimedAt,
   );
 
-
+  @override
+  String toString() {
+    return 'ProducerDto{initialized: $initialized, owner: $owner, resourceId: $resourceId, locationId: $locationId, productionRate: $productionRate, productionTime: $productionTime, awaitingUnits: $awaitingUnits, claimedAt: $claimedAt}';
+  }
 }

@@ -37,11 +37,11 @@ class ItemListPage extends StatelessWidget {
                   /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
-                  subtitle: buildItemButtons(context, item),
+                  subtitle: buildItemButtons(context, item, state.items),
                 );
               } else {
                 return ListTile(
-                  title: Text("Toolbar"),
+                  title: const Text("Toolbar"),
                   /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
@@ -62,9 +62,11 @@ class ItemListPage extends StatelessWidget {
     );
   }
 
-  Row buildItemButtons(BuildContext context, Item item) {
+  Row buildItemButtons(BuildContext context, Item item, List<Item> items) {
     if(item.runtimeType == Producer) {
       final producer = item as Producer;
+      final existingStorage = items.where((i) => i.runtimeType == Storage).map((i) => i as Storage).where((i) => i.initialized).firstOrNull;
+
       return Row(
         children: [
           OutlinedButton(
@@ -72,6 +74,12 @@ class ItemListPage extends StatelessWidget {
               context.itemListBloc.add(ProducerInitialized(producer));
             },
             child: const Text("init"),
+          ),
+          OutlinedButton(
+            onPressed: item.readyToProduce && existingStorage != null ? () {
+              context.itemListBloc.add(ProductionStarted(producer, existingStorage));
+            } : null,
+            child: Text("produce ${producer.resource.name}"),
           ),
         ],
       );
@@ -119,6 +127,12 @@ class ItemListPage extends StatelessWidget {
     return Row(
       children: [
         OutlinedButton(
+          onPressed: () {
+            context.itemListBloc.add(const HeartbeatEnabled(true));
+          },
+          child: const Text("Toggle Heartbeat"),
+        ),
+        OutlinedButton(
           onPressed: setupNeeded ? () {
             context.itemListBloc.add(const LocationCreated("Location 1", 1));
             //context.itemListBloc.add(const ProducerCreated(1));
@@ -128,7 +142,7 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 1));
+            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 30));
           } : null,
           child: const Text("Create Producer"),
         ),

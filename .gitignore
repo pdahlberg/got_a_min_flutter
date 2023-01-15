@@ -127,6 +127,10 @@ app.*.map.json
 !.idea/dictionaries/
 !.idea/runConfigurations/
 
+# Solana
+/test-ledger/**
+
+# Secrets
 secrets.dart
 secrets/
 /local.properties

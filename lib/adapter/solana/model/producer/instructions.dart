@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
+import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:solana/encoder.dart';
 
 part 'instructions.g.dart';
@@ -48,6 +49,31 @@ class InvokeProducerCall extends InvokeBase<InitProducer> {
         owner.keyPair,
       ],
     );
+  }
+
+  produce(Producer producer, Storage storage) async {
+    final entityKeyPair = producer.id.keyPair!;
+    var resource = producer.resource;
+
+    debugPrint("InvokeProducerCall.produce");
+
+    try {
+      await send(
+        method: 'produce_without_input',
+        accounts: <AccountMeta>[
+          AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: false),
+          AccountMeta.writeable(pubKey: resource.id.keyPair!.publicKey, isSigner: false),
+          AccountMeta.writeable(pubKey: storage.id.keyPair!.publicKey, isSigner: false),
+          AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
+        ],
+        signers: [
+          owner.keyPair,
+        ],
+      );
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+
   }
 
 }
