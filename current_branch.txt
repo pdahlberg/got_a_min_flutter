@@ -1,0 +1,5 @@
+#### Goal
+Server: Proucer without input continously produce when up until storage limit is reached.
+Client: This means that client can show a continously running numer calculated from last claim timestamp and producation rate.
+
+
