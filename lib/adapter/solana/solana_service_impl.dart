@@ -113,6 +113,8 @@ class SolanaServiceImpl extends SolanaServicePort {
   @override
   Future<ProducerDto> fetchProducerAccount(Producer producer) async {
     final ProducerAccount decoded = await _fetchAccountInfo(producer.id.publicKey, ProducerAccount.fromAccountData);
+    final secondsDiff = (_timeService.nowMillis() ~/ 1000) - decoded.claimedAt;
+    debugPrint("Claimed: ${decoded.claimedAt}, diff: $secondsDiff, millis: ${_timeService.nowMillis()}");
     return ProducerDto(
       true,
       decoded.owner.toBase58(),
@@ -138,6 +140,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   @override
   Future<StorageDto> fetchStorageAccount(Storage storage) async {
     final StorageAccount decoded = await _fetchAccountInfo(storage.id.publicKey, StorageAccount.fromAccountData);
+    debugPrint("Storage amount: ${decoded.amount}");
     return StorageDto(
       true,
       decoded.owner.toBase58(),

@@ -16,6 +16,8 @@ class Storage extends Item {
   final MobilityType mobilityType;
   final int movementSpeed;
 
+  bool get fullCapacity => amount == capacity;
+
   const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType, this.movementSpeed);
   const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, MobilityType.fixed, 0);
 
@@ -46,8 +48,7 @@ class Storage extends Item {
   }
 
   @override
-  String label() => "${owner?.getName()}'s ${resource.name} storage amount=$amount, mt=$mobilityType, spd=$movementSpeed";
-
+  String label() => "${owner?.getName()}'s ${resource.name} storage amount=$amount ${fullCapacity ? '[FULL]' : ''}, mt=$mobilityType, spd=$movementSpeed";
 
   @override
   String toString() {

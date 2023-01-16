@@ -65,8 +65,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     return _game!;
   }
 
-  Future<void> _onRefresh(ItemListRefreshed event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onRefresh(ItemListRefreshed event, Emitter<ItemListState> emit) async {
     //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
     emit(state.copyWith(items: _itemRepository.findAll()));
   }
@@ -133,6 +132,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         event.productionRate,
         event.productionTime,
         0,
+        0,
     );
     final saved = _itemRepository.save(newItem);
 
@@ -161,12 +161,13 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       productionRate: dto.productionRate,
       productionTime: dto.productionTime,
       awaitingUnits: dto.awaitingUnits,
+      claimedAt: dto.claimedAt,
       timestamp: _timeService.nowMillis(),
     );
 
     debugPrint("resinit: ${producer.initialized}, ${dto.initialized}");
 
-    _itemRepository.save(producer);
+    _producerRepository.save(producer);
 
     add(ItemListRefreshed());
   }

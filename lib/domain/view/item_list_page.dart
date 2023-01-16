@@ -166,13 +166,13 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateProducer ? () {
-            context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 30));
+            context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 1));
           } : null,
           child: const Text("+Producer"),
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 10));
+            context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 1000));
           } : null,
           child: const Text("+Storage"),
         ),
