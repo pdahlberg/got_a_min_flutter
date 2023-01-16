@@ -2,6 +2,7 @@
 import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';

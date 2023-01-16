@@ -1,15 +1,8 @@
-import 'package:got_a_min_flutter/infra/extension_methods.dart';
-import 'package:solana/solana.dart';
 
-class Owner {
+import 'package:got_a_min_flutter/domain/model/has_id.dart';
 
-  final Ed25519HDKeyPair keyPair;
+mixin Owner implements HasId {
 
-  Owner(this.keyPair);
-
-  @override
-  String toString() {
-    return keyPair.publicKey.toShortString();
-  }
+  String getName();
 
 }

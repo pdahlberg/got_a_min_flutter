@@ -3,7 +3,7 @@ import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
-import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
@@ -22,7 +22,7 @@ class Storage extends Item {
   Storage copyWith({
     ItemId? id,
     int? timestamp,
-    Owner? owner,
+    Player? owner,
     bool? initialized,
     Resource? resource,
     Location? location,
@@ -46,7 +46,7 @@ class Storage extends Item {
   }
 
   @override
-  String label() => "Storage(${resource.name}) amount=$amount, mt=$mobilityType, spd=$movementSpeed";
+  String label() => "${owner?.getName()}'s ${resource.name} storage amount=$amount, mt=$mobilityType, spd=$movementSpeed";
 
 
   @override

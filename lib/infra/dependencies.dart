@@ -5,8 +5,10 @@ import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_details_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
+import 'package:got_a_min_flutter/domain/bloc/player_bloc.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
+import 'package:got_a_min_flutter/domain/persistence/player_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/producer_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/storage_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
@@ -28,6 +30,7 @@ class Dependencies {
     }),
     RepositoryProvider<ProducerRepository>(create: ProducerRepository.of),
     RepositoryProvider<StorageRepository>(create: StorageRepository.of),
+    RepositoryProvider<PlayerRepository>(create: PlayerRepository.of),
     RepositoryProvider<SolanaServicePort>(create: SolanaServiceImpl.of),
   ];
 
@@ -36,6 +39,7 @@ class Dependencies {
       ..add(ItemListRefreshed())
     ),
     const BlocProvider<ItemDetailsBloc>(create: ItemDetailsBloc.of),
+    const BlocProvider<PlayerBloc>(create: PlayerBloc.of),
   ];
 
   static List<RepositoryProvider> prod() => [

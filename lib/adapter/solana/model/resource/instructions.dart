@@ -3,7 +3,7 @@ import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
-import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/encoder.dart';
@@ -43,11 +43,11 @@ class InvokeResourceCall extends InvokeBase<InitResource> {
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: resource.id.keyPair!.publicKey, isSigner: true),
-        AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
+        AccountMeta.writeable(pubKey: owner.getId().publicKey, isSigner: true),
       ],
       signers: [
         resource.id.keyPair!,
-        owner.keyPair,
+        owner.getId().keyPair!,
       ],
     );
   }

@@ -41,12 +41,12 @@ class InvokeProducerCall extends InvokeBase<InitProducer> {
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: true),
         AccountMeta.writeable(pubKey: producer.location.id.keyPair!.publicKey, isSigner: true),
-        AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
+        AccountMeta.writeable(pubKey: owner.getId().publicKey, isSigner: true),
       ],
       signers: [
         entityKeyPair,
         producer.location.id.keyPair!,
-        owner.keyPair,
+        owner.getId().keyPair!,
       ],
     );
   }
@@ -64,10 +64,10 @@ class InvokeProducerCall extends InvokeBase<InitProducer> {
           AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: false),
           AccountMeta.writeable(pubKey: resource.id.keyPair!.publicKey, isSigner: false),
           AccountMeta.writeable(pubKey: storage.id.keyPair!.publicKey, isSigner: false),
-          AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
+          AccountMeta.writeable(pubKey: owner.getId().publicKey, isSigner: true),
         ],
         signers: [
-          owner.keyPair,
+          owner.getId().keyPair!,
         ],
       );
     } catch (e) {

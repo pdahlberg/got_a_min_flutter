@@ -12,8 +12,9 @@ import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
+import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -33,7 +34,6 @@ class SolanaServiceImpl extends SolanaServicePort {
   );
   final TimeService _timeService;
   final SolanaClient _solanaClient;
-  Owner? _owner;
 
   static SolanaClient _createTestSolanaClient() => SolanaClient(
     rpcUrl: Uri.parse(devnetRpcUrl),
@@ -43,29 +43,17 @@ class SolanaServiceImpl extends SolanaServicePort {
   SolanaServiceImpl(
     this._timeService,
     this._solanaClient,
-    this._owner,
   );
 
   SolanaServiceImpl.of(BuildContext context) : this(
     context.read(),
     _createTestSolanaClient(),
-    null,
   );
 
   @override
-  Future<Owner> getOwner() async {
-    if(_owner == null) {
-      final kp = await Ed25519HDKeyPair.random();
-      _owner = Owner(kp);
-
-      await devAirdrop(_owner!.keyPair.publicKey);
-    }
-    return Future.value(_owner);
-  }
-
-  Future<void> devAirdrop(Ed25519HDPublicKey publicKey) async {
+  Future<void> devAirdrop(ItemId id) async {
     await _solanaClient.requestAirdrop(
-      address: publicKey,
+      address: id.publicKey,
       lamports: 10 * lamportsPerSol,
       commitment: Commitment.confirmed,
     );
@@ -73,7 +61,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   initLocation(Location location) async {
-    await devAirdrop(location.id.publicKey);
+    await devAirdrop(location.id);
 
     await InvokeInitLocation(_solanaClient, programId, location.owner!).run(location);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
@@ -81,7 +69,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   initProducer(Producer producer) async {
-    await devAirdrop(producer.id.publicKey);
+    await devAirdrop(producer.id);
 
     await InvokeProducerCall(_solanaClient, programId, producer.owner!).init(producer);
   }
@@ -96,7 +84,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   initResource(Resource resource) async {
-    await devAirdrop(resource.id.publicKey);
+    await devAirdrop(resource.id);
 
     await InvokeResourceCall(_solanaClient, programId, resource.owner!).run(resource);
     //await InvokeInitResource(_solanaClient, _programId, item.owner!).run(resource);
@@ -104,7 +92,7 @@ class SolanaServiceImpl extends SolanaServicePort {
 
   @override
   initStorage(Storage storage) async {
-    await devAirdrop(storage.id.publicKey);
+    await devAirdrop(storage.id);
 
     await InvokeStorageCall(_solanaClient, programId, storage.owner!).init(storage);
   }

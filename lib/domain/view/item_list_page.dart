@@ -1,19 +1,23 @@
 
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
+import 'package:got_a_min_flutter/domain/bloc/player_bloc.dart';
+import 'package:got_a_min_flutter/domain/bloc/player_events.dart';
+import 'package:got_a_min_flutter/domain/bloc/player_state.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
-import 'package:collection/collection.dart';
 
 class ItemListPage extends StatelessWidget {
 
@@ -45,7 +49,11 @@ class ItemListPage extends StatelessWidget {
                   /*onTap: () {
                   router.push(ItemDetailsRoute(address: item.id.publicKey.toBase58()));
                 },*/
-                  subtitle: buildToolbarButtons(context, state.items),
+                  subtitle: BlocBuilder<PlayerBloc, PlayerState>(
+                    builder: (context, playerState) {
+                      return buildToolbarButtons(context, playerState.player_, state.items);
+                    }
+                  ),
                 );
               }
             },
@@ -118,13 +126,16 @@ class ItemListPage extends StatelessWidget {
     );
   }
 
-  buildToolbarButtons(BuildContext context, List<Item> items) {
+  Widget buildToolbarButtons(BuildContext context, Player? player, List<Item> items) {
     final setupNeeded = items.isEmpty;
     final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).where((i) => i.initialized).firstOrNull;
     final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).where((i) => i.initialized).firstOrNull;
-    final canCreateStorage = existingLocation != null && existingResource != null;
+    final canCreateProducer = existingLocation != null && existingResource != null && player != null;
+    final canCreateStorage = existingLocation != null && existingResource != null && player != null;
 
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      direction: Axis.horizontal,
       children: [
         OutlinedButton(
           onPressed: () {
@@ -132,27 +143,39 @@ class ItemListPage extends StatelessWidget {
           },
           child: const Text("Toggle Heartbeat"),
         ),
-        OutlinedButton(
+        if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {
             context.itemListBloc.add(const LocationCreated("Location 1", 1));
-            //context.itemListBloc.add(const ProducerCreated(1));
             context.itemListBloc.add(const ResourceCreated("Resource A"));
+            context.playerBloc.add(const PlayerCreated());
           } : null,
           child: const Text("Setup"),
         ),
+        Text(player?.name ?? "No player"),
         OutlinedButton(
-          onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(ProducerCreated(existingResource, existingLocation, 1, 30));
+          onPressed: () {
+            context.playerBloc.add(const PlayerCreated());
+          },
+          child: const Text("+P"),
+        ),
+        OutlinedButton(
+          onPressed: player == null ? null : () {
+            context.playerBloc.add(PlayerNextActivated(player));
+          },
+          child: const Text("P>>"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateProducer ? () {
+            context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 30));
           } : null,
-          child: const Text("Create Producer"),
+          child: const Text("+Producer"),
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(StorageCreated(existingResource, existingLocation, 10));
+            context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 10));
           } : null,
-          child: const Text("Create Storage"),
+          child: const Text("+Storage"),
         ),
-        // context.itemListBloc.add(const StorageCreated(10));
       ],
     );
   }

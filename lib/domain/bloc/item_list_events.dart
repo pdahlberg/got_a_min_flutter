@@ -1,6 +1,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -30,14 +31,15 @@ class LocationInitialized extends ItemListEvent {
 }
 
 class ProducerCreated extends ItemListEvent {
+  final Player player;
   final Resource resource;
   final Location location;
   final int productionRate;
   final int productionTime;
-  const ProducerCreated(this.resource, this.location, this.productionRate, this.productionTime);
+  const ProducerCreated(this.player, this.resource, this.location, this.productionRate, this.productionTime);
 
   @override
-  List<Object?> get props => [resource, location, productionRate, productionTime];
+  List<Object?> get props => [player, resource, location, productionRate, productionTime];
 }
 
 class ResourceCreated extends ItemListEvent {
@@ -49,13 +51,14 @@ class ResourceCreated extends ItemListEvent {
 }
 
 class StorageCreated extends ItemListEvent {
+  final Player player;
   final Resource resource;
   final Location location;
   final int capacity;
-  const StorageCreated(this.resource, this.location, this.capacity);
+  const StorageCreated(this.player, this.resource, this.location, this.capacity);
 
   @override
-  List<Object?> get props => [resource, location, capacity];
+  List<Object?> get props => [player, resource, location, capacity];
 }
 
 class ProducerInitialized extends ItemListEvent {

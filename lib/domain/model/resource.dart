@@ -28,7 +28,7 @@ class Resource extends Item {
   }
 
   @override
-  String label() => "$name ${id.publicKey.toShortString()}";
+  String label() => "${owner?.getName()}'s $name ${id.publicKey.toShortString()}";
 
 
   @override

@@ -3,11 +3,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_details_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
+import 'package:got_a_min_flutter/domain/bloc/player_bloc.dart';
 import 'package:solana/solana.dart';
 
 extension BuildContextExtensions on BuildContext {
   ItemListBloc get itemListBloc => read();
   ItemDetailsBloc get itemDetailsBloc => read();
+  PlayerBloc get playerBloc => read();
 }
 
 extension CompactPrint on Ed25519HDPublicKey {

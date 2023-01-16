@@ -2,7 +2,7 @@
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
@@ -22,7 +22,7 @@ class Producer extends Item {
   Producer copyWith({
     ItemId? id,
     int? timestamp,
-    Owner? owner,
+    Player? owner,
     bool? initialized,
     Resource? resource,
     Location? location,
@@ -44,7 +44,7 @@ class Producer extends Item {
   }
 
   @override
-  String label() => "${resource.name} producer (waiting: $awaitingUnits)";
+  String label() => "${owner?.getName()}'s ${resource.name} prod (waiting: $awaitingUnits)";
 
   @override
   String toString() {

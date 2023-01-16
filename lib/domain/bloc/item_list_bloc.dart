@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
+import 'package:got_a_min_flutter/domain/model/game.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
@@ -53,6 +54,17 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     context.read(),
   );
 
+  Game? _game;
+
+  Future<Game> _getGame() async {
+    if(_game == null) {
+      final id = await ItemId.random();
+      await _solanaServicePort.devAirdrop(id);
+      _game = Game(id);
+    }
+    return _game!;
+  }
+
   Future<void> _onRefresh(ItemListRefreshed event,
       Emitter<ItemListState> emit) async {
     //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
@@ -63,16 +75,17 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final owner = await _solanaServicePort.getOwner();
+    final game = await _getGame();
     final newItem = Location(
         await ItemId.random(),
-        owner,
+        game,
         false,
         nowMillis,
         event.name,
         event.position,
         100,
-        0);
+        0,
+    );
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -110,10 +123,9 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final owner = await _solanaServicePort.getOwner();
     final newItem = Producer(
         await ItemId.random(),
-        owner,
+        event.player,
         false,
         nowMillis,
         event.resource,
@@ -169,9 +181,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final owner = await _solanaServicePort.getOwner();
-    final newItem = Resource(
-        await ItemId.random(), owner, false, nowMillis, event.name);
+    final owner = await _getGame();
+    final newItem = Resource(await ItemId.random(), owner, false, nowMillis, event.name);
     final saved = _itemRepository.save(newItem);
 
     emit(state.copyWith(
@@ -206,10 +217,9 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final owner = await _solanaServicePort.getOwner();
     final newItem = Storage(
         await ItemId.random(),
-        owner,
+        event.player,
         false,
         nowMillis,
         event.resource,

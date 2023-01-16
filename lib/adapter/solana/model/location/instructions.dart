@@ -4,7 +4,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';
@@ -40,11 +40,11 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: entityKeyPair.publicKey, isSigner: true),
-        AccountMeta.writeable(pubKey: owner.keyPair.publicKey, isSigner: true),
+        AccountMeta.writeable(pubKey: owner.getId().publicKey, isSigner: true),
       ],
       signers: [
         entityKeyPair,
-        owner.keyPair,
+        owner.getId().keyPair!,
       ],
     );
   }

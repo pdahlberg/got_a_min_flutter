@@ -2,6 +2,7 @@
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
 class Location extends Item {
@@ -47,7 +48,7 @@ class Location extends Item {
   }
 
   @override
-  String label() => "$name @ $position [$occupiedSpace/$capacity] ${id.publicKey.toShortString()}";
+  String label() => "${owner?.getName()}'s $name @ $position [$occupiedSpace/$capacity] ${id.publicKey.toShortString()}";
 
   @override
   String toString() {
