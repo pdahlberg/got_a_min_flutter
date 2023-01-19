@@ -139,9 +139,15 @@ class ItemListPage extends StatelessWidget {
       children: [
         OutlinedButton(
           onPressed: () {
-            context.itemListBloc.add(const HeartbeatEnabled(true));
+            context.itemListBloc.add(const HeartbeatEnabledProducer(true));
           },
-          child: const Text("Toggle Heartbeat"),
+          child: const Text("Auto Produce"),
+        ),
+        OutlinedButton(
+          onPressed: () {
+            context.itemListBloc.add(const HeartbeatEnabledProductionSync(true));
+          },
+          child: const Text("Local Prod Sync"),
         ),
         if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {

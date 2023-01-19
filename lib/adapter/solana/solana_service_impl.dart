@@ -27,6 +27,7 @@ import 'model/location/account.dart';
 
 class SolanaServiceImpl extends SolanaServicePort {
 
+  static const DEFAULT_SLOT_TIME = 400;
   static const devnetRpcUrl = 'http://127.0.0.1:8899';
   static const devnetWebsocketUrl = 'ws://127.0.0.1:8900';
   static final programId = Ed25519HDPublicKey.fromBase58(
@@ -49,6 +50,32 @@ class SolanaServiceImpl extends SolanaServicePort {
     context.read(),
     _createTestSolanaClient(),
   );
+
+  @override
+  Future<int> averageSlotTime() async {
+    double average = 0.0;
+    try {
+      var samples = await _solanaClient.rpcClient.getRecentPerformanceSamples(3);
+      var count = 0;
+      double sum = 0.0;
+      for(var sample in samples) {
+        count++;
+        sum += sample.samplePeriodSecs/sample.numSlots;
+      }
+
+      if(count > 0 && sum > 0) {
+        average = (sum / count) * 1000;
+      }
+
+      debugPrint("Samples: ${samples.length}, count: $count, sum: $sum, avg: $average");
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+    //var block = await _solanaClient.rpcClient.getBlockHeight();
+    //var time = await _solanaClient.rpcClient.getBlockTime(block);
+    final result = average.toInt();
+    return result == 0 ? DEFAULT_SLOT_TIME : result;
+  }
 
   @override
   Future<void> devAirdrop(ItemId id) async {
@@ -79,7 +106,7 @@ class SolanaServiceImpl extends SolanaServicePort {
     await InvokeProducerCall(_solanaClient, programId, producer.owner!).produce(producer, storage);
     final result1 = await fetchProducerAccount(producer);
     final result2 = await fetchStorageAccount(storage);
-    debugPrint("SolanaService.produce: $result1 & $result2");
+    //debugPrint("SolanaService.produce: $result1 & $result2");
   }
 
   @override
@@ -114,7 +141,10 @@ class SolanaServiceImpl extends SolanaServicePort {
   Future<ProducerDto> fetchProducerAccount(Producer producer) async {
     final ProducerAccount decoded = await _fetchAccountInfo(producer.id.publicKey, ProducerAccount.fromAccountData);
     final secondsDiff = (_timeService.nowMillis() ~/ 1000) - decoded.claimedAt;
-    debugPrint("Claimed: ${decoded.claimedAt}, diff: $secondsDiff, millis: ${_timeService.nowMillis()}");
+    //debugPrint("Solana block: $block, time: $time");
+    //debugPrint("----====>>>> Producer: ${decoded.claimedAt} / ${_timeService.nowMillis() / 1000} / $time , awaitingUnits: ${decoded.awaitingUnits}");
+
+
     return ProducerDto(
       true,
       decoded.owner.toBase58(),
@@ -140,7 +170,7 @@ class SolanaServiceImpl extends SolanaServicePort {
   @override
   Future<StorageDto> fetchStorageAccount(Storage storage) async {
     final StorageAccount decoded = await _fetchAccountInfo(storage.id.publicKey, StorageAccount.fromAccountData);
-    debugPrint("Storage amount: ${decoded.amount}");
+    debugPrint("----====>>>> Storage: ${decoded.amount}");
     return StorageDto(
       true,
       decoded.owner.toBase58(),

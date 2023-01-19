@@ -587,10 +587,9 @@ packages:
   solana:
     dependency: "direct main"
     description:
-      name: solana
-      sha256: "026ec601347be927f7418c3575babbcb01b0be5ad62bacac4d07c7dcfb543ddd"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/home/pmd/dev/external-projects/cryptoplease-dart_pr/packages/solana"
+      relative: false
+    source: path
     version: "0.26.3"
   source_gen:
     dependency: transitive
