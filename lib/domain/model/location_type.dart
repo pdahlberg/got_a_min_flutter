@@ -1,0 +1,5 @@
+
+enum LocationType {
+  unexplored,
+  space,
+}

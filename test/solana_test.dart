@@ -101,8 +101,8 @@ void main() {
 
     expect(decoded.occupied_space, 0);
     expect(decoded.capacity, 100);
-    expect(decoded.posX, 100);
-    expect(decoded.posY, 100);
+    expect(decoded.pos_x, 100);
+    expect(decoded.pos_y, 100);
     expect(decoded.name, 'name');
   });
 

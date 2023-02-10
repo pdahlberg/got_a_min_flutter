@@ -14,6 +14,8 @@ mixin _$_AccountData {
   String get name => throw UnimplementedError();
   BigInt get pos_x => throw UnimplementedError();
   BigInt get pos_y => throw UnimplementedError();
+  int get location_type => throw UnimplementedError();
+  int get bump => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
@@ -25,6 +27,8 @@ mixin _$_AccountData {
     const BString().write(writer, name);
     const BU64().write(writer, pos_x);
     const BU64().write(writer, pos_y);
+    const BU8().write(writer, location_type);
+    const BU8().write(writer, bump);
 
     return writer.toArray();
   }
@@ -39,6 +43,8 @@ class __AccountData extends _AccountData {
     required this.name,
     required this.pos_x,
     required this.pos_y,
+    required this.location_type,
+    required this.bump,
   }) : super._();
 
   final List<int> discriminator;
@@ -48,6 +54,8 @@ class __AccountData extends _AccountData {
   final String name;
   final BigInt pos_x;
   final BigInt pos_y;
+  final int location_type;
+  final int bump;
 }
 
 class B_AccountData implements BType<_AccountData> {
@@ -68,6 +76,8 @@ class B_AccountData implements BType<_AccountData> {
       name: const BString().read(reader),
       pos_x: const BU64().read(reader),
       pos_y: const BU64().read(reader),
+      location_type: const BU8().read(reader),
+      bump: const BU8().read(reader),
     );
   }
 }

@@ -12,8 +12,9 @@ class LocationAccount implements AnchorAccount {
     required this.occupied_space,
     required this.capacity,
     required this.name,
-    required this.posX,
-    required this.posY,
+    required this.pos_x,
+    required this.pos_y,
+    required this.location_type,
   });
 
   factory LocationAccount._fromBinary(
@@ -27,8 +28,9 @@ class LocationAccount implements AnchorAccount {
       occupied_space: accountData.occupied_space.toInt(),
       capacity: accountData.capacity.toInt(),
       name: accountData.name.toString(),
-      posX: accountData.pos_x.toInt(),
-      posY: accountData.pos_y.toInt(),
+      pos_x: accountData.pos_x.toInt(),
+      pos_y: accountData.pos_y.toInt(),
+      location_type: accountData.location_type.toInt(),
     );
   }
 
@@ -46,8 +48,11 @@ class LocationAccount implements AnchorAccount {
   final int occupied_space;
   final int capacity;
   final String name;
-  final int posX;
-  final int posY;
+  final int pos_x;
+  final int pos_y;
+  final int location_type;
+
+
 /*
 *     pub pos_x: i64,
     pub pos_y: i64,
@@ -58,7 +63,7 @@ class LocationAccount implements AnchorAccount {
 
   @override
   String toString() {
-    return 'LocationAccount{owner: ${owner.toBase58()}, occupied_space: $occupied_space, capacity: $capacity, position: ${posX}x$posY, name: $name}';
+    return 'LocationAccount{owner: ${owner.toBase58()}, occupied_space: $occupied_space, capacity: $capacity, position: ${pos_x}x$pos_y, name: $name}';
   }
 }
 
@@ -72,6 +77,8 @@ class _AccountData with _$_AccountData {
     @BString() required String name,
     @BU64() required BigInt pos_x,
     @BU64() required BigInt pos_y,
+    @BU8() required int location_type,
+    @BU8() required int bump,
   }) = __AccountData;
 
   _AccountData._();
