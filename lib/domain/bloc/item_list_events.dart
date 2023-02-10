@@ -17,8 +17,9 @@ class ItemListRefreshed extends ItemListEvent {}
 
 class LocationCreated extends ItemListEvent {
   final String name;
-  final int position;
-  const LocationCreated(this.name, this.position);
+  final int posX;
+  final int posY;
+  const LocationCreated(this.name, this.posX, this.posY);
 }
 
 class LocationInitialized extends ItemListEvent {

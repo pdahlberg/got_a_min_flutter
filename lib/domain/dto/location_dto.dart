@@ -8,7 +8,8 @@ class LocationDto {
   final String owner;
   final int occupiedSpace;
   final int capacity;
-  final int position;
+  final int posX;
+  final int posY;
 
   LocationDto(
     this.initialized,
@@ -16,7 +17,8 @@ class LocationDto {
     this.owner,
     this.occupiedSpace,
     this.capacity,
-    this.position,
+    this.posX,
+    this.posY,
   );
 
 

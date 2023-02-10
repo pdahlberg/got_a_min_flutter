@@ -84,7 +84,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         false,
         nowMillis,
         event.name,
-        event.position,
+        event.posX,
+        event.posY,
         100,
         0,
     );
@@ -107,7 +108,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
     final location = event.location.copyWith(
       name: dto.name,
-      position: dto.position,
+      posX: dto.posX,
+      posY: dto.posY,
       capacity: dto.capacity,
       occupiedSpace: dto.occupiedSpace,
       initialized: dto.initialized,

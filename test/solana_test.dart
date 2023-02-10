@@ -65,7 +65,8 @@ void main() {
         arguments: ByteArray(
           InitLocation(
             name: "name",
-            position: BigInt.from(100),
+            pos_x: BigInt.from(100),
+            pos_y: BigInt.from(100),
             capacity: BigInt.from(100),
           ).toBorsh().toList(),
         ),
@@ -100,7 +101,8 @@ void main() {
 
     expect(decoded.occupied_space, 0);
     expect(decoded.capacity, 100);
-    expect(decoded.position, 100);
+    expect(decoded.posX, 100);
+    expect(decoded.posY, 100);
     expect(decoded.name, 'name');
   });
 

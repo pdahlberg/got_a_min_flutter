@@ -60,7 +60,7 @@ class ItemListPage extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              context.itemListBloc.add(const LocationCreated("Location 1", 1));
+              context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
               //context.itemListBloc.add(const ProducerCreated(1));
               context.itemListBloc.add(const ResourceCreated("Resource A"));
             },
@@ -151,7 +151,7 @@ class ItemListPage extends StatelessWidget {
         ),
         if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {
-            context.itemListBloc.add(const LocationCreated("Location 1", 1));
+            context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
             context.itemListBloc.add(const ResourceCreated("Resource A"));
             context.playerBloc.add(const PlayerCreated());
           } : null,

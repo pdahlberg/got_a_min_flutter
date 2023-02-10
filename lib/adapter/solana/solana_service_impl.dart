@@ -133,7 +133,8 @@ class SolanaServiceImpl extends SolanaServicePort {
       decoded.owner.toBase58(),
       decoded.occupied_space,
       decoded.capacity,
-      decoded.position,
+      decoded.posX,
+      decoded.posY,
     );
   }
 
