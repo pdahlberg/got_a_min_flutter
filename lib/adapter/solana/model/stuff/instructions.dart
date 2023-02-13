@@ -29,13 +29,15 @@ class InvokeInitStuff extends InvokeBase<InitStuff> {
 
 
     final writer1 = BinaryWriter();
-    const BString().write(writer1, "stuff");
+    //const BString().write(writer1, "stuff");
+    const BU64().write(writer1, BigInt.from(11));
 
 
     final pda = await Ed25519HDPublicKey.findProgramAddress(
         seeds: [
           utf8.encode("stuff"),
           owner.getId().publicKey.bytes,
+          writer1.toArray(),
         ],
         programId: programId,
     );
@@ -43,7 +45,7 @@ class InvokeInitStuff extends InvokeBase<InitStuff> {
     final result = await send(
       method: 'debug_init_stuff',
       params: InitStuff(
-        x: BigInt.from(10),
+        x: BigInt.from(11),
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: pda, isSigner: false),
