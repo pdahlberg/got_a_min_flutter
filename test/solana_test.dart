@@ -90,12 +90,12 @@ void main() {
   test('Init Location', () async {
 
     final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
-    final x = 2;
-    final y = 2;
+    final x = 3;
+    final y = 3;
 
     final pda = await Ed25519HDPublicKey.findProgramAddress(
       seeds: [
-        utf8.encode("stuff"),
+        utf8.encode("map-location"),
         p1.getId().publicKey.bytes,
         i64Bytes(x),
         i64Bytes(y),
