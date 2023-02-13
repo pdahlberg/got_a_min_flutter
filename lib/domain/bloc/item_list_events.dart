@@ -17,8 +17,9 @@ class ItemListRefreshed extends ItemListEvent {}
 
 class LocationCreated extends ItemListEvent {
   final String name;
-  final int position;
-  const LocationCreated(this.name, this.position);
+  final int posX;
+  final int posY;
+  const LocationCreated(this.name, this.posX, this.posY);
 }
 
 class LocationInitialized extends ItemListEvent {
@@ -107,10 +108,19 @@ class StorageRefreshed extends ItemListEvent {
   List<Object?> get props => [storage];
 }
 
-class HeartbeatEnabled extends ItemListEvent {
+class HeartbeatEnabledProducer extends ItemListEvent {
   final bool enabled;
 
-  const HeartbeatEnabled(this.enabled);
+  const HeartbeatEnabledProducer(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
+
+class HeartbeatEnabledProductionSync extends ItemListEvent {
+  final bool enabled;
+
+  const HeartbeatEnabledProductionSync(this.enabled);
 
   @override
   List<Object?> get props => [enabled];

@@ -26,6 +26,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   final SolanaServicePort _solanaServicePort;
   final StorageRepository _storageRepository;
   final ProducerRepository _producerRepository;
+  StreamSubscription<int>? listenerAutoProducer;
+  StreamSubscription<int>? listenerProductionSync;
 
   ItemListBloc(this._timeService,
       this._itemRepository,
@@ -43,7 +45,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     on<StorageCreated>(_onStorageCreated);
     on<StorageInitialized>(_onStorageInit);
     on<StorageRefreshed>(_onStorageRefresh);
-    on<HeartbeatEnabled>(_onHeartbeatEnabled);
+    on<HeartbeatEnabledProducer>(_onHeartbeatEnabledProducer);
+    on<HeartbeatEnabledProductionSync>(_onHeartbeatEnabledProductionSync);
   }
 
   ItemListBloc.of(BuildContext context) : this(
@@ -65,8 +68,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     return _game!;
   }
 
-  Future<void> _onRefresh(ItemListRefreshed event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onRefresh(ItemListRefreshed event, Emitter<ItemListState> emit) async {
     //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
     emit(state.copyWith(items: _itemRepository.findAll()));
   }
@@ -82,7 +84,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         false,
         nowMillis,
         event.name,
-        event.position,
+        event.posX,
+        event.posY,
         100,
         0,
     );
@@ -105,7 +108,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
     final location = event.location.copyWith(
       name: dto.name,
-      position: dto.position,
+      posX: dto.posX,
+      posY: dto.posY,
       capacity: dto.capacity,
       occupiedSpace: dto.occupiedSpace,
       initialized: dto.initialized,
@@ -132,6 +136,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         event.location,
         event.productionRate,
         event.productionTime,
+        0,
         0,
     );
     final saved = _itemRepository.save(newItem);
@@ -161,12 +166,11 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       productionRate: dto.productionRate,
       productionTime: dto.productionTime,
       awaitingUnits: dto.awaitingUnits,
+      claimedAt: dto.claimedAt,
       timestamp: _timeService.nowMillis(),
     );
 
-    debugPrint("resinit: ${producer.initialized}, ${dto.initialized}");
-
-    _itemRepository.save(producer);
+    _producerRepository.save(producer);
 
     add(ItemListRefreshed());
   }
@@ -206,8 +210,6 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       timestamp: _timeService.nowMillis(),
     );
 
-    debugPrint("resinit: ${resource.initialized}, ${dto.initialized}");
-
     _itemRepository.save(resource);
 
     add(ItemListRefreshed());
@@ -227,7 +229,10 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         0,
         event.capacity,
         MobilityType.movable,
-        1);
+        1,
+        0,
+        0,
+    );
     final saved = _storageRepository.save(newItem);
 
     emit(state.copyWith(
@@ -254,30 +259,26 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     final storage = event.storage.copyWith(
       initialized: dto.initialized,
       amount: dto.amount,
+      simulatedAmount: dto.amount,
       capacity: dto.capacity,
       mobilityType: dto.getMobilityType(),
       timestamp: _timeService.nowMillis(),
     );
-
-    debugPrint("resinit: ${storage.initialized}, ${dto.initialized}");
 
     _storageRepository.save(storage);
 
     add(ItemListRefreshed());
   }
 
-  StreamSubscription<int>? listener;
-
-  Future<void> _onHeartbeatEnabled(HeartbeatEnabled event, Emitter<ItemListState> emit) async {
+  Future<void> _onHeartbeatEnabledProducer(HeartbeatEnabledProducer event, Emitter<ItemListState> emit) async {
     // Ignoring the incoming event variable for now...
-    if(listener != null) {
+    if(listenerAutoProducer != null) {
       debugPrint("Disabling heartbeat listener");
-      listener?.cancel();
-      listener = null;
+      listenerAutoProducer?.cancel();
+      listenerAutoProducer = null;
     } else {
       debugPrint("Enabling heartbeat listener");
-      listener = _timeService.heartbeat.asBroadcastStream().listen((event) {
-        debugPrint("Heartbeat: $event");
+      listenerAutoProducer = _timeService.heartbeat.listen((event) {
         _producerRepository.findAll().forEach((producer) {
           Storage? storage = _storageRepository
               .findByLocationAndResource(producer.location, producer.resource)
@@ -288,6 +289,49 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
             debugPrint("No storage found for $producer");
           }
         });
+      });
+    }
+  }
+
+  var steps = 0;
+  Future<void> _onHeartbeatEnabledProductionSync(HeartbeatEnabledProductionSync event, Emitter<ItemListState> emit) async {
+    // Ignoring the incoming event variable for now...
+    if(listenerProductionSync != null) {
+      debugPrint("Disabling heartbeat listener for prod sync");
+      if(listenerProductionSync!.isPaused) {
+        listenerProductionSync!.resume();
+      } else {
+        listenerProductionSync!.pause();
+      }
+      //listenerProductionSync = null;
+    } else {
+      final newInterval = await _solanaServicePort.averageSlotTime();
+      _timeService.setHeartbeatInterval(millis: newInterval);
+      debugPrint("Enabling heartbeat listener for prod sync");
+      debugPrint("newInterval = $newInterval");
+      listenerProductionSync = _timeService.heartbeat.listen((timeUnit) async {
+        final time = _timeService.nowMillis();
+        debugPrint("timeUnit: $timeUnit, time: $time, interval: ${_timeService.heartbeatInterval}");
+        steps++;
+        if(steps > 5) {
+          final newInterval = await _solanaServicePort.averageSlotTime();
+          _timeService.setHeartbeatInterval(millis: newInterval);
+          steps = 0;
+        }
+
+        /*_storageRepository
+            .findAll()
+            .map((s) {
+              var diff = seconds - s.simulatedAmountTimestamp;
+              return s.copyWith(
+                simulatedAmount: s.simulatedAmount + diff,
+                simulatedAmountTimestamp: seconds,
+              );
+            })
+            .forEach((s) {
+              final saved = _storageRepository.save(s);
+              add(ItemListRefreshed());
+            });*/
       });
     }
   }

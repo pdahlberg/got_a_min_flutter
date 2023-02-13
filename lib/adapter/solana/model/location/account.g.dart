@@ -12,7 +12,10 @@ mixin _$_AccountData {
   BigInt get occupied_space => throw UnimplementedError();
   BigInt get capacity => throw UnimplementedError();
   String get name => throw UnimplementedError();
-  BigInt get position => throw UnimplementedError();
+  BigInt get pos_x => throw UnimplementedError();
+  BigInt get pos_y => throw UnimplementedError();
+  int get location_type => throw UnimplementedError();
+  int get bump => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
@@ -22,7 +25,10 @@ mixin _$_AccountData {
     const BU64().write(writer, occupied_space);
     const BU64().write(writer, capacity);
     const BString().write(writer, name);
-    const BU64().write(writer, position);
+    const BU64().write(writer, pos_x);
+    const BU64().write(writer, pos_y);
+    const BU8().write(writer, location_type);
+    const BU8().write(writer, bump);
 
     return writer.toArray();
   }
@@ -35,7 +41,10 @@ class __AccountData extends _AccountData {
     required this.occupied_space,
     required this.capacity,
     required this.name,
-    required this.position,
+    required this.pos_x,
+    required this.pos_y,
+    required this.location_type,
+    required this.bump,
   }) : super._();
 
   final List<int> discriminator;
@@ -43,7 +52,10 @@ class __AccountData extends _AccountData {
   final BigInt occupied_space;
   final BigInt capacity;
   final String name;
-  final BigInt position;
+  final BigInt pos_x;
+  final BigInt pos_y;
+  final int location_type;
+  final int bump;
 }
 
 class B_AccountData implements BType<_AccountData> {
@@ -62,7 +74,10 @@ class B_AccountData implements BType<_AccountData> {
       occupied_space: const BU64().read(reader),
       capacity: const BU64().read(reader),
       name: const BString().read(reader),
-      position: const BU64().read(reader),
+      pos_x: const BU64().read(reader),
+      pos_y: const BU64().read(reader),
+      location_type: const BU8().read(reader),
+      bump: const BU8().read(reader),
     );
   }
 }

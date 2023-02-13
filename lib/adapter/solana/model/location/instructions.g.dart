@@ -8,14 +8,16 @@ part of 'instructions.dart';
 
 mixin _$InitLocation {
   String get name => throw UnimplementedError();
-  BigInt get position => throw UnimplementedError();
+  BigInt get pos_x => throw UnimplementedError();
+  BigInt get pos_y => throw UnimplementedError();
   BigInt get capacity => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
 
     const BString().write(writer, name);
-    const BU64().write(writer, position);
+    const BU64().write(writer, pos_x);
+    const BU64().write(writer, pos_y);
     const BU64().write(writer, capacity);
 
     return writer.toArray();
@@ -25,12 +27,14 @@ mixin _$InitLocation {
 class _InitLocation extends InitLocation {
   _InitLocation({
     required this.name,
-    required this.position,
+    required this.pos_x,
+    required this.pos_y,
     required this.capacity,
   }) : super._();
 
   final String name;
-  final BigInt position;
+  final BigInt pos_x;
+  final BigInt pos_y;
   final BigInt capacity;
 }
 
@@ -46,7 +50,8 @@ class BInitLocation implements BType<InitLocation> {
   InitLocation read(BinaryReader reader) {
     return InitLocation(
       name: const BString().read(reader),
-      position: const BU64().read(reader),
+      pos_x: const BU64().read(reader),
+      pos_y: const BU64().read(reader),
       capacity: const BU64().read(reader),
     );
   }

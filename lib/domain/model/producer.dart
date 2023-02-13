@@ -4,7 +4,6 @@ import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
-import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
 class Producer extends Item {
 
@@ -13,9 +12,10 @@ class Producer extends Item {
   final int productionRate;
   final int productionTime;
   final int awaitingUnits;
+  final int claimedAt;
 
-  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime, this.awaitingUnits);
-  const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0);
+  const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime, this.awaitingUnits, this.claimedAt);
+  const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0, 0);
 
   bool get readyToProduce => initialized; // Should include storage
 
@@ -29,6 +29,7 @@ class Producer extends Item {
     int? productionRate,
     int? productionTime,
     int? awaitingUnits,
+    int? claimedAt,
   }) {
     return Producer(
       id ?? this.id,
@@ -39,12 +40,13 @@ class Producer extends Item {
       location ?? this.location,
       productionRate ?? this.productionRate,
       productionTime ?? this.productionTime,
-        awaitingUnits ?? this.awaitingUnits,
+      awaitingUnits ?? this.awaitingUnits,
+      claimedAt ?? this.claimedAt,
     );
   }
 
   @override
-  String label() => "${owner?.getName()}'s ${resource.name} prod (waiting: $awaitingUnits)";
+  String label() => "${owner?.getName()}'s ${resource.name} prod (waiting: $awaitingUnits, claimed: $claimedAt)";
 
   @override
   String toString() {
@@ -55,9 +57,11 @@ class Producer extends Item {
   List<Object?> get props => [
     ...super.props,
     resource,
+    location,
     productionRate,
     productionTime,
     awaitingUnits,
+    claimedAt,
   ];
 
 }

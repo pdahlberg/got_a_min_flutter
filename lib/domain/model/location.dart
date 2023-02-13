@@ -8,7 +8,8 @@ import 'package:got_a_min_flutter/infra/extension_methods.dart';
 class Location extends Item {
 
   final String name;
-  final int position;
+  final int posX;
+  final int posY;
   final int capacity;
   final int occupiedSpace;
 
@@ -18,12 +19,13 @@ class Location extends Item {
     super.initialized,
     super.timestamp,
     this.name,
-    this.position,
+    this.posX,
+    this.posY,
     this.capacity,
     this.occupiedSpace,
   );
   //const Location.from(String name) : this(const ItemId.empty(), name, 0, null, false);
-  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0);
+  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0, 0);
 
   Location copyWith({
     ItemId? id,
@@ -31,7 +33,8 @@ class Location extends Item {
     int? timestamp,
     Owner? owner,
     bool? initialized,
-    int? position,
+    int? posX,
+    int? posY,
     int? capacity,
     int? occupiedSpace,
   }) {
@@ -41,14 +44,15 @@ class Location extends Item {
       initialized ?? this.initialized,
       timestamp ?? this.timestamp,
       name ?? this.name,
-      position ?? this.position,
+      posX ?? this.posX,
+      posY ?? this.posY,
       capacity ?? this.capacity,
       occupiedSpace ?? this.occupiedSpace,
     );
   }
 
   @override
-  String label() => "${owner?.getName()}'s $name @ $position [$occupiedSpace/$capacity] ${id.publicKey.toShortString()}";
+  String label() => "${owner?.getName()}'s $name @ ${posX}x$posY [$occupiedSpace/$capacity] ${id.publicKey.toShortString()}";
 
   @override
   String toString() {
@@ -59,7 +63,8 @@ class Location extends Item {
   List<Object?> get props => [
     ...super.props,
     name,
-    position,
+    posX,
+    posY,
     capacity,
     occupiedSpace,
   ];

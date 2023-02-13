@@ -60,7 +60,7 @@ class ItemListPage extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              context.itemListBloc.add(const LocationCreated("Location 1", 1));
+              context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
               //context.itemListBloc.add(const ProducerCreated(1));
               context.itemListBloc.add(const ResourceCreated("Resource A"));
             },
@@ -139,13 +139,19 @@ class ItemListPage extends StatelessWidget {
       children: [
         OutlinedButton(
           onPressed: () {
-            context.itemListBloc.add(const HeartbeatEnabled(true));
+            context.itemListBloc.add(const HeartbeatEnabledProducer(true));
           },
-          child: const Text("Toggle Heartbeat"),
+          child: const Text("Auto Produce"),
+        ),
+        OutlinedButton(
+          onPressed: () {
+            context.itemListBloc.add(const HeartbeatEnabledProductionSync(true));
+          },
+          child: const Text("Local Prod Sync"),
         ),
         if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {
-            context.itemListBloc.add(const LocationCreated("Location 1", 1));
+            context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
             context.itemListBloc.add(const ResourceCreated("Resource A"));
             context.playerBloc.add(const PlayerCreated());
           } : null,
@@ -166,13 +172,13 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateProducer ? () {
-            context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 30));
+            context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 1));
           } : null,
           child: const Text("+Producer"),
         ),
         OutlinedButton(
           onPressed: canCreateStorage ? () {
-            context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 10));
+            context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 1000));
           } : null,
           child: const Text("+Storage"),
         ),

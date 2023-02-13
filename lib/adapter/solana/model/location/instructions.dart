@@ -15,7 +15,8 @@ part 'instructions.g.dart';
 class InitLocation with _$InitLocation implements WithToBorsh<InitLocation> {
   factory InitLocation({
     @BString() required String name,
-    @BU64() required BigInt position,
+    @BU64() required BigInt pos_x,
+    @BU64() required BigInt pos_y,
     @BU64() required BigInt capacity,
   }) = _InitLocation;
 
@@ -35,7 +36,8 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
       method: 'init_location',
       params: InitLocation(
         name: location.name,
-        position: BigInt.from(location.position),
+        pos_x: BigInt.from(location.posX),
+        pos_y: BigInt.from(location.posY),
         capacity: BigInt.from(location.capacity),
       ),
       accounts: <AccountMeta>[

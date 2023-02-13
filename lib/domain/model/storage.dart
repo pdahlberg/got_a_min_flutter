@@ -15,9 +15,13 @@ class Storage extends Item {
   final int capacity;
   final MobilityType mobilityType;
   final int movementSpeed;
+  final int simulatedAmount;
+  final int simulatedAmountTimestamp;
 
-  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType, this.movementSpeed);
-  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, MobilityType.fixed, 0);
+  bool get fullCapacity => amount == capacity;
+
+  const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType, this.movementSpeed, this.simulatedAmount, this.simulatedAmountTimestamp);
+  const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, MobilityType.fixed, 0, 0, 0);
 
   Storage copyWith({
     ItemId? id,
@@ -30,6 +34,8 @@ class Storage extends Item {
     int? capacity,
     MobilityType? mobilityType,
     int? movementSpeed,
+    int? simulatedAmount,
+    int? simulatedAmountTimestamp,
   }) {
     return Storage(
       id ?? this.id,
@@ -42,12 +48,13 @@ class Storage extends Item {
       capacity ?? this.capacity,
       mobilityType ?? this.mobilityType,
       movementSpeed ?? this.movementSpeed,
+      simulatedAmount ?? this.simulatedAmount,
+      simulatedAmountTimestamp ?? this.simulatedAmountTimestamp,
     );
   }
 
   @override
-  String label() => "${owner?.getName()}'s ${resource.name} storage amount=$amount, mt=$mobilityType, spd=$movementSpeed";
-
+  String label() => "${owner?.getName()}'s ${resource.name} storage amount=$amount/$simulatedAmount ${fullCapacity ? '[FULL]' : ''}, mt=$mobilityType, spd=$movementSpeed";
 
   @override
   String toString() {
@@ -63,6 +70,8 @@ class Storage extends Item {
     capacity,
     mobilityType,
     movementSpeed,
+    simulatedAmount,
+    simulatedAmountTimestamp,
   ];
 
 }

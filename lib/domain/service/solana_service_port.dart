@@ -30,6 +30,8 @@ abstract class SolanaServicePort {
 
   Future<StorageDto> fetchStorageAccount(Storage storage);
 
+  Future<int> averageSlotTime();
+
   Future<void> devAirdrop(ItemId id);
 
 }
