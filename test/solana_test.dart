@@ -5,7 +5,10 @@ import 'package:got_a_min_flutter/adapter/solana/model/location/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
+import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
@@ -57,6 +60,20 @@ void main() {
     );
   });
 
+  test('Init Stuff - PDA test', () async {
+    final p1 = Player(ItemId(payer), "p1");
+    final initStuff = InvokeInitStuff(client, SolanaServiceImpl.programId, p1);
+
+    await initStuff.run();
+
+    /*final account = await client.rpcClient.getAccountInfo(
+      location.address,
+      commitment: Commitment.confirmed,
+      encoding: Encoding.base64,
+    );*/
+
+  });
+
   test('Init Location', () async {
     final instructions = [
       await AnchorInstruction.forMethod(
@@ -68,6 +85,7 @@ void main() {
             pos_x: BigInt.from(100),
             pos_y: BigInt.from(100),
             capacity: BigInt.from(100),
+            location_type: 0,
           ).toBorsh().toList(),
         ),
         accounts: <AccountMeta>[

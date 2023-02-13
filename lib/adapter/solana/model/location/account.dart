@@ -15,6 +15,7 @@ class LocationAccount implements AnchorAccount {
     required this.pos_x,
     required this.pos_y,
     required this.location_type,
+    required this.bump,
   });
 
   factory LocationAccount._fromBinary(
@@ -31,6 +32,7 @@ class LocationAccount implements AnchorAccount {
       pos_x: accountData.pos_x.toInt(),
       pos_y: accountData.pos_y.toInt(),
       location_type: accountData.location_type.toInt(),
+      bump: accountData.bump.toInt(),
     );
   }
 
@@ -51,6 +53,7 @@ class LocationAccount implements AnchorAccount {
   final int pos_x;
   final int pos_y;
   final int location_type;
+  final int bump;
 
 
 /*

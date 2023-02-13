@@ -1,6 +1,7 @@
 
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/location_type.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
@@ -12,6 +13,7 @@ class Location extends Item {
   final int posY;
   final int capacity;
   final int occupiedSpace;
+  final LocationType type;
 
   const Location(
     super.id,
@@ -23,9 +25,10 @@ class Location extends Item {
     this.posY,
     this.capacity,
     this.occupiedSpace,
+    this.type,
   );
   //const Location.from(String name) : this(const ItemId.empty(), name, 0, null, false);
-  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0, 0);
+  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0, 0, LocationType.unexplored);
 
   Location copyWith({
     ItemId? id,
@@ -37,6 +40,7 @@ class Location extends Item {
     int? posY,
     int? capacity,
     int? occupiedSpace,
+    LocationType? type,
   }) {
     return Location(
       id ?? this.id,
@@ -48,6 +52,7 @@ class Location extends Item {
       posY ?? this.posY,
       capacity ?? this.capacity,
       occupiedSpace ?? this.occupiedSpace,
+      type ?? this.type,
     );
   }
 
@@ -67,6 +72,7 @@ class Location extends Item {
     posY,
     capacity,
     occupiedSpace,
+    type,
   ];
 
 }
