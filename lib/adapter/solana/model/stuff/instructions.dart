@@ -25,19 +25,12 @@ class InvokeInitStuff extends InvokeBase<InitStuff> {
 
   InvokeInitStuff(super.client, super.programId, super.owner);
 
-  run() async {
-
-
-    final writer1 = BinaryWriter();
-    //const BString().write(writer1, "stuff");
-    const BU64().write(writer1, BigInt.from(11));
-
-
+  run(int x) async {
     final pda = await Ed25519HDPublicKey.findProgramAddress(
         seeds: [
           utf8.encode("stuff"),
           owner.getId().publicKey.bytes,
-          writer1.toArray(),
+          i64Bytes(x),
         ],
         programId: programId,
     );
@@ -45,7 +38,7 @@ class InvokeInitStuff extends InvokeBase<InitStuff> {
     final result = await send(
       method: 'debug_init_stuff',
       params: InitStuff(
-        x: BigInt.from(11),
+        x: BigInt.from(x),
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: pda, isSigner: false),

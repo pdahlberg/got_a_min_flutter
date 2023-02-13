@@ -10,7 +10,7 @@ class Player extends Equatable implements Owner {
   final String name;
 
   const Player(this.id, this.name);
-  const Player.empty() : this(const ItemId.empty(), "");
+  Player.empty() : this(ItemId.empty(), "");
 
   @override
   ItemId getId() => id;

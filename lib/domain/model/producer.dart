@@ -15,7 +15,7 @@ class Producer extends Item {
   final int claimedAt;
 
   const Producer(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.productionRate, this.productionTime, this.awaitingUnits, this.claimedAt);
-  const Producer.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, 0, 0);
+  Producer.empty() : this(ItemId.empty(), null, false, 0, Resource.empty(), Location.empty(), 0, 0, 0, 0);
 
   bool get readyToProduce => initialized; // Should include storage
 

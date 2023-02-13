@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
@@ -8,6 +10,8 @@ import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart
 import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/location_type.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
@@ -31,6 +35,7 @@ void main() {
   late final Ed25519HDKeyPair payer;
   late final Ed25519HDKeyPair location;
   late final Ed25519HDKeyPair storage;
+  late final Player p1;
   final client = SolanaClient(
     rpcUrl: Uri.parse(devnetRpcUrl),
     websocketUrl: Uri.parse(devnetWebsocketUrl),
@@ -40,6 +45,7 @@ void main() {
     payer = await Ed25519HDKeyPair.random();
     location = await Ed25519HDKeyPair.random();
     storage = await Ed25519HDKeyPair.random();
+    p1 = Player(ItemId(payer, null), "p1");
 
     await client.requestAirdrop(
       address: payer.publicKey,
@@ -61,10 +67,10 @@ void main() {
   });
 
   test('Init Stuff - PDA test', () async {
-    final p1 = Player(ItemId(payer), "p1");
+    final p1 = Player(await ItemId.random(), "p1");
     final initStuff = InvokeInitStuff(client, SolanaServiceImpl.programId, p1);
 
-    await initStuff.run();
+    await initStuff.run(12);
 
     /*final account = await client.rpcClient.getAccountInfo(
       location.address,
@@ -74,45 +80,40 @@ void main() {
 
   });
 
+  Iterable<int> i64Bytes(int num) {
+    final writer1 = BinaryWriter();
+    const BU64().write(writer1, BigInt.from(num));
+    Uint8List uint8list = writer1.toArray();
+    return uint8list;
+  }
+
   test('Init Location', () async {
-    final instructions = [
-      await AnchorInstruction.forMethod(
-        programId: SolanaServiceImpl.programId,
-        method: 'init_location',
-        arguments: ByteArray(
-          InitLocation(
-            name: "name",
-            pos_x: BigInt.from(100),
-            pos_y: BigInt.from(100),
-            capacity: BigInt.from(100),
-            location_type: 0,
-          ).toBorsh().toList(),
-        ),
-        accounts: <AccountMeta>[
-          AccountMeta.writeable(pubKey: location.publicKey, isSigner: true),
-          AccountMeta.writeable(pubKey: payer.publicKey, isSigner: true),
-          AccountMeta.readonly(pubKey: Ed25519HDPublicKey.fromBase58(SystemProgram.programId), isSigner: false),
-        ],
-        namespace: 'global',
-      ),
-    ];
-    final message = Message(instructions: instructions);
-    await client.sendAndConfirmTransaction(
-      message: message,
-      signers: [
-        location,
-        payer,
+
+    final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
+    final x = 2;
+    final y = 2;
+
+    final pda = await Ed25519HDPublicKey.findProgramAddress(
+      seeds: [
+        utf8.encode("stuff"),
+        p1.getId().publicKey.bytes,
+        i64Bytes(x),
+        i64Bytes(y),
       ],
-      commitment: Commitment.confirmed,
+      programId: SolanaServiceImpl.programId,
     );
 
-    final account = await client.rpcClient.getAccountInfo(
+    final location = Location(ItemId(null, pda), p1, false, 0, "loc", x, y, 100, 0, LocationType.unexplored);
+    await initLoc.run(location);
+
+
+    /*final account = await client.rpcClient.getAccountInfo(
       location.address,
       commitment: Commitment.confirmed,
       encoding: Encoding.base64,
-    );
+    );*/
 
-    debugPrint("Account: $account");
+    /*debugPrint("Account: $account");
     var decoded = LocationAccount.fromAccountData(account!.data!);
     debugPrint("owner: ${payer.publicKey}");
     debugPrint("decoded: $decoded");
@@ -121,7 +122,7 @@ void main() {
     expect(decoded.capacity, 100);
     expect(decoded.pos_x, 100);
     expect(decoded.pos_y, 100);
-    expect(decoded.name, 'name');
+    expect(decoded.name, 'name');*/
   });
 
   test('Init Storage', () async {

@@ -34,24 +34,12 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
   InvokeInitLocation(super.client, super.programId, super.owner);
 
   run(Location location) async {
-    final entityKeyPair = location.id.keyPair!;
-
-    final writer1 = BinaryWriter();
-    const BString().write(writer1, "map-location");
-
-    final writer2 = BinaryWriter();
-    const BU64().write(writer2, BigInt.from(location.posX));
-
-    final writer3 = BinaryWriter();
-    const BU64().write(writer3, BigInt.from(location.posY));
-
-
     final pda = await Ed25519HDPublicKey.findProgramAddress(
         seeds: [
-          writer1.toArray(),
+          stringBytes("map-location"),
           owner.getId().publicKey.bytes,
-          writer2.toArray(),
-          writer3.toArray(),
+          i64Bytes(location.posX),
+          i64Bytes(location.posY),
         ],
         programId: programId,
     );

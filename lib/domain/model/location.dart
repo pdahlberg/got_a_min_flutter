@@ -28,7 +28,7 @@ class Location extends Item {
     this.type,
   );
   //const Location.from(String name) : this(const ItemId.empty(), name, 0, null, false);
-  const Location.empty() : this(const ItemId.empty(), null, false, 0, "", 0, 0, 0, 0, LocationType.unexplored);
+  Location.empty() : this(ItemId.empty(), null, false, 0, "", 0, 0, 0, 0, LocationType.unexplored);
 
   Location copyWith({
     ItemId? id,
