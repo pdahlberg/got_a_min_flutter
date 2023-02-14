@@ -2,16 +2,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/map/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
+import 'package:got_a_min_flutter/domain/dto/game_map_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
@@ -179,6 +182,22 @@ class SolanaServiceImpl extends SolanaServicePort {
       decoded.amount,
       decoded.capacity,
       decoded.mobilityType,
+    );
+  }
+
+  @override
+  Future<GameMapDto> fetchMapAccount(GameMap map) async {
+    final MapAccount decoded = await _fetchAccountInfo(map.id.publicKey, MapAccount.fromAccountData);
+    debugPrint("----====>>>> GameMap: ${decoded.width}x${decoded.height}");
+    return GameMapDto(
+      true,
+      decoded.owner.toBase58(),
+      decoded.row_ptrs,
+      decoded.columns,
+      decoded.values,
+      decoded.width,
+      decoded.height,
+      decoded.compressed_value,
     );
   }
 

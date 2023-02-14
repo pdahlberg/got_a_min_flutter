@@ -64,9 +64,9 @@ class _AccountData with _$_AccountData {
   factory _AccountData({
     @BFixedArray(8, BU8()) required List<int> discriminator,
     @BFixedArray(32, BU8()) required List<int> owner,
-    @BFixedArray(1, BU8()) required List<int> row_ptrs,
-    @BFixedArray(1, BU8()) required List<int> columns,
-    @BFixedArray(1, BU8()) required List<int> values,
+    @BFixedArray(10, BU8()) required List<int> row_ptrs,
+    @BFixedArray(20, BU8()) required List<int> columns,
+    @BFixedArray(20, BU8()) required List<int> values,
     @BU8() required int width,
     @BU8() required int height,
     @BU8() required int compressed_value,

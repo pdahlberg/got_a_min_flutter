@@ -15,6 +15,8 @@ import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/location_type.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
+import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
+import 'package:got_a_min_flutter/domain/service/time_service.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
@@ -42,6 +44,7 @@ void main() {
     rpcUrl: Uri.parse(devnetRpcUrl),
     websocketUrl: Uri.parse(devnetWebsocketUrl),
   );
+  final SolanaServicePort solanaService = SolanaServiceImpl(TimeService(), client);
 
   setUpAll(() async {
     payer = await Ed25519HDKeyPair.random();
@@ -75,6 +78,10 @@ void main() {
     await requestAirdrop(client, map.id.keyPair!);
 
     await mapInstr.init(map);
+
+    final dto = await solanaService.fetchMapAccount(map);
+
+    debugPrint("map dto: $dto");
 
     /*final account = await client.rpcClient.getAccountInfo(
       location.address,

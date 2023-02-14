@@ -21,9 +21,9 @@ mixin _$_AccountData {
 
     const BFixedArray(8, BU8()).write(writer, discriminator);
     const BFixedArray(32, BU8()).write(writer, owner);
-    const BFixedArray(1, BU8()).write(writer, row_ptrs);
-    const BFixedArray(1, BU8()).write(writer, columns);
-    const BFixedArray(1, BU8()).write(writer, values);
+    const BFixedArray(10, BU8()).write(writer, row_ptrs);
+    const BFixedArray(20, BU8()).write(writer, columns);
+    const BFixedArray(20, BU8()).write(writer, values);
     const BU8().write(writer, width);
     const BU8().write(writer, height);
     const BU8().write(writer, compressed_value);
@@ -67,9 +67,9 @@ class B_AccountData implements BType<_AccountData> {
     return _AccountData(
       discriminator: const BFixedArray(8, BU8()).read(reader),
       owner: const BFixedArray(32, BU8()).read(reader),
-      row_ptrs: const BFixedArray(1, BU8()).read(reader),
-      columns: const BFixedArray(1, BU8()).read(reader),
-      values: const BFixedArray(1, BU8()).read(reader),
+      row_ptrs: const BFixedArray(10, BU8()).read(reader),
+      columns: const BFixedArray(20, BU8()).read(reader),
+      values: const BFixedArray(20, BU8()).read(reader),
       width: const BU8().read(reader),
       height: const BU8().read(reader),
       compressed_value: const BU8().read(reader),

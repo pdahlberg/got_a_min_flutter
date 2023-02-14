@@ -1,8 +1,10 @@
 
+import 'package:got_a_min_flutter/domain/dto/game_map_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
@@ -29,6 +31,8 @@ abstract class SolanaServicePort {
   Future<ResourceDto> fetchResourceAccount(Resource resource);
 
   Future<StorageDto> fetchStorageAccount(Storage storage);
+
+  Future<GameMapDto> fetchMapAccount(GameMap map);
 
   Future<int> averageSlotTime();
 
