@@ -5,10 +5,12 @@ import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/map/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/location_type.dart';
@@ -47,23 +49,9 @@ void main() {
     storage = await Ed25519HDKeyPair.random();
     p1 = Player(ItemId(payer, null), "p1");
 
-    await client.requestAirdrop(
-      address: payer.publicKey,
-      lamports: 10 * lamportsPerSol,
-      commitment: Commitment.confirmed,
-    );
-
-    await client.requestAirdrop(
-      address: location.publicKey,
-      lamports: 10 * lamportsPerSol,
-      commitment: Commitment.confirmed,
-    );
-
-    await client.requestAirdrop(
-      address: storage.publicKey,
-      lamports: 10 * lamportsPerSol,
-      commitment: Commitment.confirmed,
-    );
+    await requestAirdrop(client, payer);
+    await requestAirdrop(client, location);
+    await requestAirdrop(client, storage);
   });
 
   test('Init Stuff - PDA test', () async {
@@ -71,6 +59,22 @@ void main() {
     final initStuff = InvokeInitStuff(client, SolanaServiceImpl.programId, p1);
 
     await initStuff.run(12);
+
+    /*final account = await client.rpcClient.getAccountInfo(
+      location.address,
+      commitment: Commitment.confirmed,
+      encoding: Encoding.base64,
+    );*/
+
+  });
+
+  test('Init Map', () async {
+    final mapInstr = InvokeMapCall(client, SolanaServiceImpl.programId, p1);
+
+    GameMap map = GameMap(await ItemId.random(), 0);
+    await requestAirdrop(client, map.id.keyPair!);
+
+    await mapInstr.init(map);
 
     /*final account = await client.rpcClient.getAccountInfo(
       location.address,
@@ -172,5 +176,13 @@ void main() {
     expect(decoded.capacity, 100);
   });
 
+}
+
+Future<void> requestAirdrop(SolanaClient client, Ed25519HDKeyPair storage) async {
+  await client.requestAirdrop(
+    address: storage.publicKey,
+    lamports: 10 * lamportsPerSol,
+    commitment: Commitment.confirmed,
+  );
 }
 
