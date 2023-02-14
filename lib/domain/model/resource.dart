@@ -9,7 +9,7 @@ class Resource extends Item {
   final String name;
 
   const Resource(super.id, super.owner, super.initialized, super.timestamp, this.name);
-  const Resource.empty() : this(const ItemId.empty(), null, false, 0, "");
+  Resource.empty() : this(ItemId.empty(), null, false, 0, "");
 
   Resource copyWith({
     ItemId? id,

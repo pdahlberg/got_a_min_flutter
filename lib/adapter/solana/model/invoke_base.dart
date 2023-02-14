@@ -1,4 +1,7 @@
 
+import 'dart:convert';
+
+import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
@@ -45,6 +48,17 @@ class InvokeBase<T> {
       signers: signers,
       commitment: Commitment.confirmed,
     );
+  }
+
+  Iterable<int> i64Bytes(int num) {
+    final writer1 = BinaryWriter();
+    const BU64().write(writer1, BigInt.from(num));
+    Uint8List uint8list = writer1.toArray();
+    return uint8list;
+  }
+
+  Iterable<int> stringBytes(String str) {
+    return utf8.encode(str);
   }
 
 }

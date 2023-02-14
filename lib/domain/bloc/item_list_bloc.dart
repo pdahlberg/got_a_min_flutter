@@ -9,6 +9,7 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/model/game.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/location_type.dart';
 import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
@@ -88,6 +89,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
         event.posY,
         100,
         0,
+        LocationType.unexplored,
     );
     final saved = _itemRepository.save(newItem);
 

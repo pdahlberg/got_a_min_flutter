@@ -5,23 +5,30 @@ import 'package:solana/solana.dart';
 
 class ItemId extends Equatable {
 
+  static final Ed25519HDPublicKey nothingPubKey = Ed25519HDPublicKey.fromBase58("11111111111111111111111111111111");
   final Ed25519HDKeyPair? keyPair;
+  final Ed25519HDPublicKey pubKey;
 
-  const ItemId(this.keyPair);
-  const ItemId.empty() : this(null);
+  ItemId(Ed25519HDKeyPair? kp, Ed25519HDPublicKey? pk) :
+        keyPair = kp,
+        pubKey = pk ?? kp?.publicKey ?? nothingPubKey;
+  ItemId.empty() : this(null, nothingPubKey);
 
-  static Future<ItemId> random() async => ItemId(await Ed25519HDKeyPair.random());
+  static Future<ItemId> random() async {
+    final kp = await Ed25519HDKeyPair.random();
+    return ItemId(kp, kp.publicKey);
+  }
 
   Ed25519HDPublicKey get publicKey {
-    if(keyPair == null) {
-      throw UnimplementedError("ItemId.keyPair is null");
+    if(pubKey == nothingPubKey) {
+      throw UnimplementedError("ItemId.pubKey is null");
     }
-    return keyPair!.publicKey;
+    return pubKey;
   }
 
   @override
   String toString() {
-    return keyPair?.publicKey.toShortString() ?? "<ID:null>";
+    return pubKey.toShortString();
   }
 
   @override

@@ -21,7 +21,11 @@ class Storage extends Item {
   bool get fullCapacity => amount == capacity;
 
   const Storage(super.id, super.owner, super.initialized, super.timestamp, this.resource, this.location, this.amount, this.capacity, this.mobilityType, this.movementSpeed, this.simulatedAmount, this.simulatedAmountTimestamp);
+<<<<<<< HEAD
   const Storage.empty() : this(const ItemId.empty(), null, false, 0, const Resource.empty(), const Location.empty(), 0, 0, MobilityType.fixed, 0, 0, 0);
+=======
+  Storage.empty() : this(ItemId.empty(), null, false, 0, Resource.empty(), Location.empty(), 0, 0, MobilityType.fixed, 0, 0, 0);
+>>>>>>> pdas
 
   Storage copyWith({
     ItemId? id,

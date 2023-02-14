@@ -1,11 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
+import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/location_type.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/encoder.dart';
@@ -28,6 +35,7 @@ void main() {
   late final Ed25519HDKeyPair payer;
   late final Ed25519HDKeyPair location;
   late final Ed25519HDKeyPair storage;
+  late final Player p1;
   final client = SolanaClient(
     rpcUrl: Uri.parse(devnetRpcUrl),
     websocketUrl: Uri.parse(devnetWebsocketUrl),
@@ -37,6 +45,7 @@ void main() {
     payer = await Ed25519HDKeyPair.random();
     location = await Ed25519HDKeyPair.random();
     storage = await Ed25519HDKeyPair.random();
+    p1 = Player(ItemId(payer, null), "p1");
 
     await client.requestAirdrop(
       address: payer.publicKey,
@@ -57,6 +66,7 @@ void main() {
     );
   });
 
+<<<<<<< HEAD
   test('Init Location', () async {
     final instructions = [
       await AnchorInstruction.forMethod(
@@ -87,14 +97,56 @@ void main() {
       ],
       commitment: Commitment.confirmed,
     );
+=======
+  test('Init Stuff - PDA test', () async {
+    final p1 = Player(await ItemId.random(), "p1");
+    final initStuff = InvokeInitStuff(client, SolanaServiceImpl.programId, p1);
+>>>>>>> pdas
 
-    final account = await client.rpcClient.getAccountInfo(
+    await initStuff.run(12);
+
+    /*final account = await client.rpcClient.getAccountInfo(
       location.address,
       commitment: Commitment.confirmed,
       encoding: Encoding.base64,
+    );*/
+
+  });
+
+  Iterable<int> i64Bytes(int num) {
+    final writer1 = BinaryWriter();
+    const BU64().write(writer1, BigInt.from(num));
+    Uint8List uint8list = writer1.toArray();
+    return uint8list;
+  }
+
+  test('Init Location', () async {
+
+    final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
+    final x = 3;
+    final y = 3;
+
+    final pda = await Ed25519HDPublicKey.findProgramAddress(
+      seeds: [
+        utf8.encode("map-location"),
+        p1.getId().publicKey.bytes,
+        i64Bytes(x),
+        i64Bytes(y),
+      ],
+      programId: SolanaServiceImpl.programId,
     );
 
-    debugPrint("Account: $account");
+    final location = Location(ItemId(null, pda), p1, false, 0, "loc", x, y, 100, 0, LocationType.unexplored);
+    await initLoc.run(location);
+
+
+    /*final account = await client.rpcClient.getAccountInfo(
+      location.address,
+      commitment: Commitment.confirmed,
+      encoding: Encoding.base64,
+    );*/
+
+    /*debugPrint("Account: $account");
     var decoded = LocationAccount.fromAccountData(account!.data!);
     debugPrint("owner: ${payer.publicKey}");
     debugPrint("decoded: $decoded");
@@ -103,7 +155,11 @@ void main() {
     expect(decoded.capacity, 100);
     expect(decoded.pos_x, 100);
     expect(decoded.pos_y, 100);
+<<<<<<< HEAD
     expect(decoded.name, 'name');
+=======
+    expect(decoded.name, 'name');*/
+>>>>>>> pdas
   });
 
   test('Init Storage', () async {

@@ -9,7 +9,7 @@ class Game extends Equatable implements Owner {
   final ItemId id;
 
   const Game(this.id);
-  const Game.empty() : this(const ItemId.empty());
+  Game.empty() : this(ItemId.empty());
 
   @override
   ItemId getId() => id;
