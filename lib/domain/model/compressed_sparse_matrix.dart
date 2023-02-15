@@ -24,6 +24,12 @@ class CompressedSparseMatrix {
     this.values = values.sublist(0, biggestLen + 1);
   }
 
+  Matrix toMatrix() {
+    final matrix = Matrix.empty(width: width, height: height, emptyValue: compressedValue);
+    unpack(matrix);
+    return matrix;
+  }
+
   void unpack(Matrix target, { int startX = 0, int startY = 0 }) {
     var rp = rowPtrs[0];
     var rpNext = rowPtrs[1];

@@ -191,6 +191,7 @@ class SolanaServiceImpl extends SolanaServicePort {
     debugPrint("----====>>>> GameMap: ${decoded.width}x${decoded.height}");
     return GameMapDto(
       true,
+      map.id,
       decoded.owner.toBase58(),
       decoded.row_ptrs,
       decoded.columns,
