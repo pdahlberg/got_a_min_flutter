@@ -1,7 +1,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
+import 'package:got_a_min_flutter/domain/model/matrix.dart';
 import 'package:tuple/tuple.dart';
 
 class CompressedSparseMatrix {
@@ -24,17 +24,7 @@ class CompressedSparseMatrix {
     this.values = values.sublist(0, biggestLen + 1);
   }
 
-  static List<List<int>> initMatrix(int columns, int rows, int compressedValue) {
-    List<List<int>> matrix = List.filled(columns, []);
-
-    for (var x = 0; x < columns; x++) {
-      matrix[x] = List.filled(rows, compressedValue);
-    }
-
-    return matrix;
-  }
-
-  void unpack(List<List<int>> targetMatrix, int startX, int startY) {
+  void unpack(Matrix target, { int startX = 0, int startY = 0 }) {
     var rp = rowPtrs[0];
     var rpNext = rowPtrs[1];
     var rpIdx = 0;
@@ -59,7 +49,7 @@ class CompressedSparseMatrix {
       var targetX = startX + x;
       var targetY = startY + rpIdx;
 
-      targetMatrix[targetX][targetY] = v;
+      target.set(targetX, targetY, v);
     }
   }
 
@@ -175,30 +165,26 @@ class CompressedSparseMatrix {
   }
 
   String asMatrixToString() {
-    var matrix = CompressedSparseMatrix.initMatrix(width, height, compressedValue);
-    unpack(matrix, 0, 0);
+    var matrix = Matrix.empty(
+        width: width,
+        height: height,
+        emptyValue: compressedValue,
+    );
 
-    var str = "";
-    for (var y = 0; y < matrix[0].length; y++) {
-      for (var x = 0; x < matrix.length; x++) {
-        str += "${matrix[x][y]}";
-      }
-      str += "\n";
-    }
-    return str;
+    unpack(matrix, startX: 0, startY: 0);
+
+    return matrix.toString(indent: 2);
   }
 
   String debugCompressedAsString() {
-    var lines = "$width x $height\n";
-    lines += "rowPtr: ";
-    rowPtrs.forEach((a) { lines += a.toString(); });
-    lines += "\n";
-    lines += "col: ";
-    columns.forEach((a) { lines += a.toString(); });
-    lines += "\n";
-    lines += "val: ";
-    values.forEach((a) { lines += a.toString(); });
-    return lines;
+    var rowPtrsStr = rowPtrs.map((a) => a.toString()).join();
+    var columnsStr = columns.map((a) => a.toString()).join();
+    var valuesStr = values.map((a) => a.toString()).join();
+
+    return "$width x $height\n"
+        "rowPtr: $rowPtrsStr\n"
+        "col: $columnsStr\n"
+        "val: $valuesStr\n";
   }
 
 }

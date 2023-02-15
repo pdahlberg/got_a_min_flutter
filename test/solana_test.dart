@@ -15,6 +15,7 @@ import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/location_type.dart';
+import 'package:got_a_min_flutter/domain/model/matrix.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
@@ -75,7 +76,7 @@ void main() {
   test('Init Map', () async {
     final mapInstr = InvokeMapCall(client, SolanaServiceImpl.programId, p1);
 
-    GameMap map = GameMap(await ItemId.random(), 0);
+    GameMap map = GameMap(await ItemId.random(), Matrix.empty());
     await requestAirdrop(client, map.id.keyPair!);
 
     await mapInstr.init(map);
