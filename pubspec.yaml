@@ -43,6 +43,7 @@ dependencies:
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
   collection: ^1.17.0
+  tuple: any
 
 dev_dependencies:
   flutter_test:

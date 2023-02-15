@@ -10,6 +10,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
+import 'package:got_a_min_flutter/domain/model/compressed_sparse_matrix.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
