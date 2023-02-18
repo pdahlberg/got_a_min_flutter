@@ -103,7 +103,7 @@ void main() {
   test('Init Location', () async {
 
     final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
-    final x = 3;
+    final x = 11;
     final y = 3;
 
     final pda = await Ed25519HDPublicKey.findProgramAddress(
@@ -121,6 +121,7 @@ void main() {
 
     final abc = await solanaService.fetchLocationAccount(location);
     debugPrint("l: ${abc.posX}");
+    debugPrint("l: ${abc.locationType} / ${abc.getLocationType()}");
 
     /*final account = await client.rpcClient.getAccountInfo(
       location.address,

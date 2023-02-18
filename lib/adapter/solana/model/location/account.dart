@@ -14,7 +14,7 @@ class LocationAccount implements AnchorAccount {
     required this.name,
     required this.pos_x,
     required this.pos_y,
-    //required this.occupied_by,
+    required this.occupied_by,
     required this.location_type,
     required this.bump,
   });
@@ -32,7 +32,7 @@ class LocationAccount implements AnchorAccount {
       name: accountData.name.toString(),
       pos_x: accountData.pos_x.toInt(),
       pos_y: accountData.pos_y.toInt(),
-      //occupied_by: [],
+      occupied_by: [],
       location_type: accountData.location_type.toInt(),
       bump: accountData.bump.toInt(),
     );
@@ -54,7 +54,7 @@ class LocationAccount implements AnchorAccount {
   final String name;
   final int pos_x;
   final int pos_y;
-  //final List<int> occupied_by;
+  final List<int> occupied_by;
   final int location_type;
   final int bump;
 
@@ -80,11 +80,11 @@ class _AccountData with _$_AccountData {
     @BFixedArray(32, BU8()) required List<int> owner,
     @BU64() required BigInt occupied_space,
     @BU64() required BigInt capacity,
-    @BString() required String name,
     @BU64() required BigInt pos_x,
     @BU64() required BigInt pos_y,
-    //@BFixedArray(10 * (32 * 2), BU8()) required List<int> occupied_by,
     @BU8() required int location_type,
+    @BString() required String name,
+    @BFixedArray(10 * (32 * 2), BU8()) required List<int> occupied_by,
     @BU8() required int bump,
   }) = __AccountData;
 
