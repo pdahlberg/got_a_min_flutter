@@ -1,10 +1,5 @@
 
-import 'package:got_a_min_flutter/domain/model/compressed_sparse_matrix.dart';
-import 'package:got_a_min_flutter/domain/model/game_map.dart';
-import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
-import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
-import 'package:solana/solana.dart';
 
 class GameMapDto {
 
@@ -29,11 +24,6 @@ class GameMapDto {
       this.height,
       this.compressed_value,
   );
-
-  GameMap toGameMap() {
-    var csm = CompressedSparseMatrix(width, height, row_ptrs, columns, values, compressed_value);
-    return GameMap(id, csm.toMatrix());
-  }
 
   @override
   String toString() {

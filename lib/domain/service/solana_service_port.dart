@@ -7,7 +7,6 @@ import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -18,11 +17,13 @@ abstract class SolanaServicePort {
 
   initProducer(Producer producer);
 
-  produce(Producer producer, Storage storage);
-
   initResource(Resource resource);
 
   initStorage(Storage storage);
+
+  initMap(GameMap map);
+
+  produce(Producer producer, Storage storage);
 
   Future<LocationDto> fetchLocationAccount(Location location);
 

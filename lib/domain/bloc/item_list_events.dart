@@ -1,5 +1,7 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:got_a_min_flutter/domain/model/game.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
@@ -29,6 +31,22 @@ class LocationInitialized extends ItemListEvent {
 
   @override
   List<Object?> get props => [location];
+}
+
+class GameMapCreated extends ItemListEvent {
+  const GameMapCreated();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class GameMapInitialized extends ItemListEvent {
+  final GameMap map;
+
+  const GameMapInitialized(this.map);
+
+  @override
+  List<Object?> get props => [map];
 }
 
 class ProducerCreated extends ItemListEvent {

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/map/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/map/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
@@ -17,7 +18,6 @@ import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -128,6 +128,13 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  initMap(GameMap map) async {
+    await devAirdrop(map.id);
+
+    await InvokeMapCall(_solanaClient, programId, map.owner!).init(map);
+  }
+
+  @override
   Future<LocationDto> fetchLocationAccount(Location location) async {
     final LocationAccount decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
@@ -210,4 +217,5 @@ class SolanaServiceImpl extends SolanaServicePort {
     );
     return decode(account!.data!);
   }
+
 }

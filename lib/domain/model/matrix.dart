@@ -35,11 +35,13 @@ class Matrix {
   String toString({ int indent = 0 }) {
     final indentStr = List.filled(indent, " ").join();
     var str = indentStr;
-    for (var y = 0; y < matrix[0].length; y++) {
-      for (var x = 0; x < matrix.length; x++) {
-        str += "${matrix[x][y]}";
+    if(matrix.isNotEmpty) {
+      for (var y = 0; y < matrix[0].length; y++) {
+        for (var x = 0; x < matrix.length; x++) {
+          str += "${matrix[x][y]}";
+        }
+        str += "\n$indentStr";
       }
-      str += "\n$indentStr";
     }
     return str;
   }

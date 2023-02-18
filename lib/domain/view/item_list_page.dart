@@ -10,6 +10,7 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_state.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
@@ -128,8 +129,10 @@ class ItemListPage extends StatelessWidget {
 
   Widget buildToolbarButtons(BuildContext context, Player? player, List<Item> items) {
     final setupNeeded = items.isEmpty;
+    final existingGameMap = items.where((i) => i.runtimeType == GameMap).map((i) => i as GameMap).where((i) => i.initialized).firstOrNull;
     final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).where((i) => i.initialized).firstOrNull;
     final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).where((i) => i.initialized).firstOrNull;
+    final canCreateGameMap = existingGameMap != null && player != null;
     final canCreateProducer = existingLocation != null && existingResource != null && player != null;
     final canCreateStorage = existingLocation != null && existingResource != null && player != null;
 
@@ -151,6 +154,7 @@ class ItemListPage extends StatelessWidget {
         ),
         if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {
+            context.itemListBloc.add(const GameMapCreated());
             context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
             context.itemListBloc.add(const ResourceCreated("Resource A"));
             context.playerBloc.add(const PlayerCreated());
@@ -169,6 +173,12 @@ class ItemListPage extends StatelessWidget {
             context.playerBloc.add(PlayerNextActivated(player));
           },
           child: const Text("P>>"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateProducer ? () {
+            context.itemListBloc.add(GameMapCreated());
+          } : null,
+          child: const Text("+Map"),
         ),
         OutlinedButton(
           onPressed: canCreateProducer ? () {

@@ -1,28 +1,42 @@
-import 'package:equatable/equatable.dart';
-import 'package:got_a_min_flutter/domain/model/has_id.dart';
+import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/matrix.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
-import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
-class GameMap extends Equatable implements Owner {
+class GameMap extends Item implements Owner {
 
-  final ItemId id;
   final Matrix matrix;
 
-  const GameMap(this.id, this.matrix);
-  GameMap.empty() : this(ItemId.empty(), Matrix.empty());
+  const GameMap(super.id, super.owner, super.initialized, super.timestamp, this.matrix);
+  GameMap.empty() : this(ItemId.empty(), null, false, 0, Matrix.empty());
 
-  @override
-  ItemId getId() => id;
+  GameMap copyWith({
+    ItemId? id,
+    Owner? owner,
+    bool? initialized,
+    int? timestamp,
+    Matrix? matrix,
+  }) {
+    return GameMap(
+      id ?? this.id,
+      owner ?? this.owner,
+      initialized ?? this.initialized,
+      timestamp ?? this.timestamp,
+      matrix ?? this.matrix,
+    );
+  }
 
   @override
   String getName() => "map";
 
   @override
+  String label() {
+    return matrix.toString();
+  }
+
+  @override
   String toString() {
-    var pk = id.publicKey.toShortString();
-    return "GameMap($matrix)";
+    return "GameMap(${label()})";
   }
 
   @override

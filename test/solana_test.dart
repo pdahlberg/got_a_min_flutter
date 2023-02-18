@@ -76,7 +76,7 @@ void main() {
   test('Init Map', () async {
     final mapInstr = InvokeMapCall(client, SolanaServiceImpl.programId, p1);
 
-    GameMap map = GameMap(await ItemId.random(), Matrix.empty());
+    GameMap map = GameMap.empty(); // todo: should not be empty
     await requestAirdrop(client, map.id.keyPair!);
 
     await mapInstr.init(map);
@@ -119,6 +119,8 @@ void main() {
     final location = Location(ItemId(null, pda), p1, false, 0, "loc", x, y, 100, 0, LocationType.unexplored);
     await initLoc.run(location);
 
+    final abc = await solanaService.fetchLocationAccount(location);
+    debugPrint("l: ${abc.posX}");
 
     /*final account = await client.rpcClient.getAccountInfo(
       location.address,
