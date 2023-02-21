@@ -9,6 +9,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/map/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/unit/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/model/compressed_sparse_matrix.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
@@ -36,6 +37,13 @@ SolanaClient createTestSolanaClient({bool useLocal = true}) => SolanaClient(
     useLocal ? devnetWebsocketUrl : 'wss://api.devnet.solana.com',
   ),
 );
+
+Iterable<int> i64Bytes(int num) {
+  final writer1 = BinaryWriter();
+  const BU64().write(writer1, BigInt.from(num));
+  Uint8List uint8list = writer1.toArray();
+  return uint8list;
+}
 
 void main() {
   late final Ed25519HDKeyPair payer;
@@ -84,21 +92,39 @@ void main() {
     final dto = await solanaService.fetchMapAccount(map);
 
     debugPrint("map dto: $dto");
-
-    /*final account = await client.rpcClient.getAccountInfo(
-      location.address,
-      commitment: Commitment.confirmed,
-      encoding: Encoding.base64,
-    );*/
-
   });
 
-  Iterable<int> i64Bytes(int num) {
-    final writer1 = BinaryWriter();
-    const BU64().write(writer1, BigInt.from(num));
-    Uint8List uint8list = writer1.toArray();
-    return uint8list;
-  }
+  test('Init Unit', () async {
+    // -------------------------
+    final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
+    final x = 2;
+    final y = 1;
+
+    final pda = await Ed25519HDPublicKey.findProgramAddress(
+      seeds: [
+        utf8.encode("map-location"),
+        p1.getId().publicKey.bytes,
+        i64Bytes(x),
+        i64Bytes(y),
+      ],
+      programId: SolanaServiceImpl.programId,
+    );
+
+    final location = Location(ItemId(null, pda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
+    await initLoc.run(location);
+
+    // -------------------------
+
+    final instr = InvokeUnitCall(client, SolanaServiceImpl.programId, p1);
+
+    //await requestAirdrop(client, map.id.keyPair!);
+
+    await instr.init("name", location);
+
+    //final dto = await solanaService.fetchMapAccount(map);
+
+    //debugPrint("map dto: $dto");
+  });
 
   test('Init Location', () async {
 
@@ -122,23 +148,6 @@ void main() {
     final abc = await solanaService.fetchLocationAccount(location);
     debugPrint("l: ${abc.posX}");
     debugPrint("l: ${abc.locationType} / ${abc.getLocationType()}");
-
-    /*final account = await client.rpcClient.getAccountInfo(
-      location.address,
-      commitment: Commitment.confirmed,
-      encoding: Encoding.base64,
-    );*/
-
-    /*debugPrint("Account: $account");
-    var decoded = LocationAccount.fromAccountData(account!.data!);
-    debugPrint("owner: ${payer.publicKey}");
-    debugPrint("decoded: $decoded");
-
-    expect(decoded.occupied_space, 0);
-    expect(decoded.capacity, 100);
-    expect(decoded.pos_x, 100);
-    expect(decoded.pos_y, 100);
-    expect(decoded.name, 'name');*/
   });
 
   test('Init Storage', () async {
