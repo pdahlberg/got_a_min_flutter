@@ -12,6 +12,7 @@ class ItemId extends Equatable {
   ItemId(Ed25519HDKeyPair? kp, Ed25519HDPublicKey? pk) :
         keyPair = kp,
         pubKey = pk ?? kp?.publicKey ?? nothingPubKey;
+  ItemId.ofPda(Ed25519HDPublicKey pubKey) : this(null, pubKey);
   ItemId.empty() : this(null, nothingPubKey);
 
   static Future<ItemId> random() async {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:borsh_annotation/borsh_annotation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
@@ -34,6 +35,10 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
   InvokeInitLocation(super.client, super.programId, super.owner);
 
   run(Location location) async {
+    var name = location.name;
+    debugPrint("x: ${location.posX}");
+    debugPrint("y: ${location.posY}");
+
     final pda = await Ed25519HDPublicKey.findProgramAddress(
         seeds: [
           stringBytes("map-location"),
@@ -47,7 +52,7 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
     await send(
       method: 'init_location',
       params: InitLocation(
-        name: location.name,
+        name: name,
         pos_x: BigInt.from(location.posX),
         pos_y: BigInt.from(location.posY),
         capacity: BigInt.from(location.capacity),

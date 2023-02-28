@@ -1,4 +1,5 @@
 import 'package:borsh_annotation/borsh_annotation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:solana/anchor.dart';
 import 'package:solana/dto.dart';
 import 'package:solana/solana.dart';
@@ -14,11 +15,9 @@ class LocationAccount implements AnchorAccount {
     required this.name,
     required this.pos_x,
     required this.pos_y,
+    required this.occupied_by,
     required this.location_type,
-<<<<<<< HEAD
-=======
     required this.bump,
->>>>>>> pdas
   });
 
   factory LocationAccount._fromBinary(
@@ -34,11 +33,9 @@ class LocationAccount implements AnchorAccount {
       name: accountData.name.toString(),
       pos_x: accountData.pos_x.toInt(),
       pos_y: accountData.pos_y.toInt(),
+      occupied_by: [],
       location_type: accountData.location_type.toInt(),
-<<<<<<< HEAD
-=======
       bump: accountData.bump.toInt(),
->>>>>>> pdas
     );
   }
 
@@ -58,11 +55,9 @@ class LocationAccount implements AnchorAccount {
   final String name;
   final int pos_x;
   final int pos_y;
+  final List<int> occupied_by;
   final int location_type;
-<<<<<<< HEAD
-=======
   final int bump;
->>>>>>> pdas
 
 
 /*
@@ -86,16 +81,64 @@ class _AccountData with _$_AccountData {
     @BFixedArray(32, BU8()) required List<int> owner,
     @BU64() required BigInt occupied_space,
     @BU64() required BigInt capacity,
-    @BString() required String name,
     @BU64() required BigInt pos_x,
     @BU64() required BigInt pos_y,
     @BU8() required int location_type,
+    @BString() required String name,
+    @BFixedArray(1 * (32 * 2), BU8()) required List<int> occupied_by,
     @BU8() required int bump,
   }) = __AccountData;
 
   _AccountData._();
 
-  factory _AccountData.fromBorsh(Uint8List data) =>
-      _$_AccountDataFromBorsh(data);
+  factory _AccountData.fromBorsh(Uint8List data) {
+    String str = "";
+    for(int i = 0; i < data.length; i++) {
+      str = "$str${data[i]},";
+      if(i % 10 == 0) {
+        str = "$str\n";
+      }
+    }
+    debugPrint("fromBorsh:\n$str");
+    return _$_AccountDataFromBorsh(data);
+  }
 }
 
+/*
+_AccountData read(BinaryReader reader) {
+    debugPrint("discriminator offest: ${reader.offset}");
+    var discriminator = const BFixedArray(8, BU8()).read(reader);
+    debugPrint("owner offest: ${reader.offset} ");
+    var owner = const BFixedArray(32, BU8()).read(reader);
+    debugPrint("occupied_space offest: ${reader.offset}");
+    var occupied_space = const BU64().read(reader);
+    debugPrint("capacity offest: ${reader.offset}");
+    var capacity = const BU64().read(reader);
+    debugPrint("pos_x offest: ${reader.offset}");
+    var pos_x = const BU64().read(reader);
+    debugPrint("pos_y offest: ${reader.offset}");
+    var pos_y = const BU64().read(reader);
+    debugPrint("location_type offest: ${reader.offset}");
+    var location_type = const BU8().read(reader);
+    debugPrint("name offest: ${reader.offset}");
+    var name = const BString().read(reader);
+    debugPrint("occupied_by offest: ${reader.offset}");
+    var occupied_by = const BFixedArray(10 * (32 * 2), BU8()).read(reader);
+    debugPrint("bump offest: ${reader.offset}");
+    var bump = const BU8().read(reader);
+    debugPrint("... after offest: ${reader.offset}");
+
+    return _AccountData(
+      discriminator: discriminator,
+      owner: owner,
+      occupied_space: occupied_space,
+      capacity: capacity,
+      pos_x: pos_x,
+      pos_y: pos_y,
+      location_type: location_type,
+      name: name,
+      occupied_by: occupied_by,
+      bump: bump,
+    );
+  }
+ */

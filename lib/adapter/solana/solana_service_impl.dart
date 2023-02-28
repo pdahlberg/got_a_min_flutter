@@ -2,22 +2,29 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/map/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/map/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/producer/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/resource/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/unit/account.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/unit/instructions.dart';
+import 'package:got_a_min_flutter/domain/dto/game_map_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
+import 'package:got_a_min_flutter/domain/dto/unit_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
+import 'package:got_a_min_flutter/domain/model/unit.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
 import 'package:solana/dto.dart';
@@ -125,6 +132,20 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
+  initMap(GameMap map) async {
+    await devAirdrop(map.id);
+
+    await InvokeMapCall(_solanaClient, programId, map.owner!).init(map);
+  }
+
+  @override
+  initUnit(Unit unit) async {
+    await devAirdrop(unit.id);
+
+    await InvokeUnitCall(_solanaClient, programId, unit.owner!).init(unit.name, unit.location);
+  }
+
+  @override
   Future<LocationDto> fetchLocationAccount(Location location) async {
     final LocationAccount decoded = await _fetchAccountInfo(location.id.publicKey, LocationAccount.fromAccountData);
     return LocationDto(
@@ -182,6 +203,37 @@ class SolanaServiceImpl extends SolanaServicePort {
     );
   }
 
+  @override
+  Future<GameMapDto> fetchMapAccount(GameMap map) async {
+    final MapAccount decoded = await _fetchAccountInfo(map.id.publicKey, MapAccount.fromAccountData);
+    debugPrint("----====>>>> GameMap: ${decoded.width}x${decoded.height}");
+    return GameMapDto(
+      true,
+      map.id,
+      decoded.owner.toBase58(),
+      decoded.row_ptrs,
+      decoded.columns,
+      decoded.values,
+      decoded.width,
+      decoded.height,
+      decoded.compressed_value,
+    );
+  }
+
+  @override
+  Future<UnitDto> fetchUnitAccount(Unit unit) async {
+    final UnitAccount decoded = await _fetchAccountInfo(unit.id.publicKey, UnitAccount.fromAccountData);
+    debugPrint("----====>>>> Unit: ${decoded.name}");
+    return UnitDto(
+      true,
+      decoded.owner.toBase58(),
+      decoded.atLocationId.toBase58(),
+      decoded.name,
+      decoded.movementSpeed,
+      decoded.arrivesAt,
+    );
+  }
+
   Future<T?> _fetchAccountInfo<T>(Ed25519HDPublicKey publicKey, Function(AccountData data) decode) async {
     final account = await _solanaClient.rpcClient.getAccountInfo(
       publicKey.toBase58(),
@@ -190,4 +242,5 @@ class SolanaServiceImpl extends SolanaServicePort {
     );
     return decode(account!.data!);
   }
+
 }

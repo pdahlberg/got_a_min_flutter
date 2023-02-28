@@ -1,10 +1,13 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:got_a_min_flutter/domain/model/game.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
+import 'package:got_a_min_flutter/domain/model/unit.dart';
 
 abstract class ItemListEvent extends Equatable {
   const ItemListEvent();
@@ -29,6 +32,22 @@ class LocationInitialized extends ItemListEvent {
 
   @override
   List<Object?> get props => [location];
+}
+
+class GameMapCreated extends ItemListEvent {
+  const GameMapCreated();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class GameMapInitialized extends ItemListEvent {
+  final GameMap map;
+
+  const GameMapInitialized(this.map);
+
+  @override
+  List<Object?> get props => [map];
 }
 
 class ProducerCreated extends ItemListEvent {
@@ -60,6 +79,22 @@ class StorageCreated extends ItemListEvent {
 
   @override
   List<Object?> get props => [player, resource, location, capacity];
+}
+
+class UnitCreated extends ItemListEvent {
+  final Player player;
+  final Location location;
+  final String name;
+  const UnitCreated(this.player, this.location, this.name);
+}
+
+class UnitInitialized extends ItemListEvent {
+  final Unit unit;
+
+  const UnitInitialized(this.unit);
+
+  @override
+  List<Object?> get props => [unit];
 }
 
 class ProducerInitialized extends ItemListEvent {

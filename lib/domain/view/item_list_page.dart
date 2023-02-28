@@ -10,12 +10,14 @@ import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/player_state.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
+import 'package:got_a_min_flutter/domain/model/unit.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
@@ -128,10 +130,14 @@ class ItemListPage extends StatelessWidget {
 
   Widget buildToolbarButtons(BuildContext context, Player? player, List<Item> items) {
     final setupNeeded = items.isEmpty;
+    final existingGameMap = items.where((i) => i.runtimeType == GameMap).map((i) => i as GameMap).where((i) => i.initialized).firstOrNull;
     final existingLocation = items.where((i) => i.runtimeType == Location).map((i) => i as Location).where((i) => i.initialized).firstOrNull;
     final existingResource = items.where((i) => i.runtimeType == Resource).map((i) => i as Resource).where((i) => i.initialized).firstOrNull;
+    final existingUnit = items.where((i) => i.runtimeType == Unit).map((i) => i as Unit).where((i) => i.initialized).firstOrNull;
+    final canCreateGameMap = existingGameMap != null && player != null;
     final canCreateProducer = existingLocation != null && existingResource != null && player != null;
     final canCreateStorage = existingLocation != null && existingResource != null && player != null;
+    final canCreateUnit = existingLocation != null && player != null;
 
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
@@ -151,7 +157,10 @@ class ItemListPage extends StatelessWidget {
         ),
         if(setupNeeded) OutlinedButton(
           onPressed: setupNeeded ? () {
-            context.itemListBloc.add(const LocationCreated("Location 1", 1, 0));
+            const x = 1;
+            const y = 0;
+            context.itemListBloc.add(const GameMapCreated());
+            context.itemListBloc.add(const LocationCreated("L1", x, y));
             context.itemListBloc.add(const ResourceCreated("Resource A"));
             context.playerBloc.add(const PlayerCreated());
           } : null,
@@ -172,6 +181,12 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateProducer ? () {
+            context.itemListBloc.add(const GameMapCreated());
+          } : null,
+          child: const Text("+Map"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateProducer ? () {
             context.itemListBloc.add(ProducerCreated(player, existingResource, existingLocation, 1, 1));
           } : null,
           child: const Text("+Producer"),
@@ -181,6 +196,12 @@ class ItemListPage extends StatelessWidget {
             context.itemListBloc.add(StorageCreated(player, existingResource, existingLocation, 1000));
           } : null,
           child: const Text("+Storage"),
+        ),
+        OutlinedButton(
+          onPressed: canCreateUnit ? () {
+            context.itemListBloc.add(UnitCreated(player, existingLocation, "unit-name"));
+          } : null,
+          child: const Text("+Unit"),
         ),
       ],
     );

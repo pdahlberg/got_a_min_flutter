@@ -1,14 +1,18 @@
 
+import 'package:got_a_min_flutter/domain/dto/game_map_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/location_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
+import 'package:got_a_min_flutter/domain/dto/unit_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
+import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
+import 'package:got_a_min_flutter/domain/model/unit.dart';
 
 abstract class SolanaServicePort {
 
@@ -16,11 +20,15 @@ abstract class SolanaServicePort {
 
   initProducer(Producer producer);
 
-  produce(Producer producer, Storage storage);
-
   initResource(Resource resource);
 
   initStorage(Storage storage);
+
+  initMap(GameMap map);
+
+  initUnit(Unit unit);
+
+  produce(Producer producer, Storage storage);
 
   Future<LocationDto> fetchLocationAccount(Location location);
 
@@ -29,6 +37,10 @@ abstract class SolanaServicePort {
   Future<ResourceDto> fetchResourceAccount(Resource resource);
 
   Future<StorageDto> fetchStorageAccount(Storage storage);
+
+  Future<GameMapDto> fetchMapAccount(GameMap map);
+
+  Future<UnitDto> fetchUnitAccount(Unit unit);
 
   Future<int> averageSlotTime();
 

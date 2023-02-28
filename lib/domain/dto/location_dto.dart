@@ -1,5 +1,4 @@
 
-import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/location_type.dart';
 
 class LocationDto {

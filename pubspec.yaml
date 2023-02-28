@@ -36,18 +36,14 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-<<<<<<< HEAD
-  solana: # ^0.26.3
-    path: /home/pmd/dev/external-projects/cryptoplease-dart_pr/packages/solana
-=======
   solana: ^0.27.0
   #  path: /home/pmd/dev/external-projects/cryptoplease-dart_pr/packages/solana
->>>>>>> pdas
   borsh_annotation: ^0.3.1+1
   auto_route: ^5.0.4
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
   collection: ^1.17.0
+  tuple: any
 
 dev_dependencies:
   flutter_test:

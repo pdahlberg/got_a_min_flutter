@@ -1,24 +1,32 @@
 
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
+import 'package:got_a_min_flutter/domain/model/compressed_sparse_matrix.dart';
 import 'package:got_a_min_flutter/domain/model/game.dart';
+import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/location_type.dart';
+import 'package:got_a_min_flutter/domain/model/matrix.dart';
 import 'package:got_a_min_flutter/domain/model/mobility_type.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
+import 'package:got_a_min_flutter/domain/model/unit.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/producer_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/storage_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/domain/service/time_service.dart';
+import 'package:solana/solana.dart';
 
 class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
@@ -36,6 +44,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       this._storageRepository,
       this._producerRepository,) : super(const ItemListState()) {
     on<ItemListRefreshed>(_onRefresh);
+    on<GameMapCreated>(_onGameMapCreated);
+    on<GameMapInitialized>(_onGameMapInit);
     on<LocationCreated>(_onLocationCreated);
     on<LocationInitialized>(_onLocationInit);
     on<ProducerCreated>(_onProducerCreated);
@@ -46,6 +56,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     on<StorageCreated>(_onStorageCreated);
     on<StorageInitialized>(_onStorageInit);
     on<StorageRefreshed>(_onStorageRefresh);
+    on<UnitCreated>(_onUnitCreated);
+    on<UnitInitialized>(_onUnitInit);
     on<HeartbeatEnabledProducer>(_onHeartbeatEnabledProducer);
     on<HeartbeatEnabledProductionSync>(_onHeartbeatEnabledProductionSync);
   }
@@ -60,8 +72,8 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
   Game? _game;
 
-  Future<Game> _getGame() async {
-    if(_game == null) {
+  Future<Game> getGame() async {
+    if (_game == null) {
       final id = await ItemId.random();
       await _solanaServicePort.devAirdrop(id);
       _game = Game(id);
@@ -69,27 +81,94 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     return _game!;
   }
 
-  Future<void> _onRefresh(ItemListRefreshed event, Emitter<ItemListState> emit) async {
+  Future<void> _onRefresh(ItemListRefreshed event,
+      Emitter<ItemListState> emit) async {
     //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
     emit(state.copyWith(items: _itemRepository.findAll()));
   }
 
-  Future<void> _onLocationCreated(LocationCreated event,
+  Future<void> _onGameMapCreated(GameMapCreated event,
       Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final game = await _getGame();
+    final game = await getGame();
+    final newItem = GameMap(
+      await ItemId.random(),
+      game,
+      false,
+      nowMillis,
+      Matrix.empty(),
+    );
+    final saved = _itemRepository.save(newItem);
+
+    emit(state.copyWith(
+      items: [
+        ...state.items,
+        saved,
+      ],
+    ));
+
+    add(GameMapInitialized(newItem));
+  }
+
+  Future<void> _onGameMapInit(GameMapInitialized event,
+      Emitter<ItemListState> emit) async {
+    await _solanaServicePort.initMap(event.map);
+    final dto = await _solanaServicePort.fetchMapAccount(event.map);
+
+    var csm = CompressedSparseMatrix(
+        dto.width, dto.height, dto.row_ptrs, dto.columns, dto.values,
+        dto.compressed_value);
+
+    final map = event.map.copyWith(
+      initialized: dto.initialized,
+      timestamp: _timeService.nowMillis(),
+      matrix: csm.toMatrix(),
+    );
+
+    _itemRepository.save(map);
+
+    add(ItemListRefreshed());
+  }
+
+  Iterable<int> i64Bytes(int num) {
+    final writer1 = BinaryWriter();
+    const BU64().write(writer1, BigInt.from(num));
+    Uint8List uint8list = writer1.toArray();
+    return uint8list;
+  }
+
+  Future<void> _onLocationCreated(LocationCreated event, Emitter<ItemListState> emit) async {
+    var nowMillis = _timeService.nowMillis();
+
+    assert(event.name.length <= 8);
+
+    final game = await getGame();
+
+    final pda = await Ed25519HDPublicKey.findProgramAddress(
+      seeds: [
+        utf8.encode("map-location"),
+        game
+            .getId()
+            .publicKey
+            .bytes,
+        i64Bytes(event.posX),
+        i64Bytes(event.posY),
+      ],
+      programId: SolanaServiceImpl.programId,
+    );
+
     final newItem = Location(
-        await ItemId.random(),
-        game,
-        false,
-        nowMillis,
-        event.name,
-        event.posX,
-        event.posY,
-        100,
-        0,
-        LocationType.unexplored,
+      ItemId.ofPda(pda),
+      game,
+      false,
+      nowMillis,
+      event.name,
+      event.posX,
+      event.posY,
+      100,
+      0,
+      LocationType.unexplored,
     );
     final saved = _itemRepository.save(newItem);
 
@@ -103,8 +182,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(LocationInitialized(newItem));
   }
 
-  Future<void> _onLocationInit(LocationInitialized event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onLocationInit(LocationInitialized event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.initLocation(event.location);
     final dto = await _solanaServicePort.fetchLocationAccount(event.location);
 
@@ -125,8 +203,43 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ItemListRefreshed());
   }
 
-  Future<void> _onProducerCreated(ProducerCreated event,
+  Future<void> _onUnitCreated(UnitCreated event,
       Emitter<ItemListState> emit) async {
+    final newItem = Unit.uninitialized(
+      event.player,
+      event.location,
+      event.name,
+    );
+    final saved = _itemRepository.save(newItem);
+
+    emit(state.copyWith(
+      items: [
+        ...state.items,
+        saved,
+      ],
+    ));
+
+    add(UnitInitialized(newItem));
+  }
+
+  Future<void> _onUnitInit(UnitInitialized event, Emitter<ItemListState> emit) async {
+    await _solanaServicePort.initUnit(event.unit);
+    final dto = await _solanaServicePort.fetchUnitAccount(event.unit);
+
+    final location = event.unit.copyWith(
+      name: dto.name,
+      initialized: dto.initialized,
+      timestamp: _timeService.nowMillis(),
+    );
+
+    debugPrint("locinit: ${location.initialized}, ${dto.initialized}");
+
+    _itemRepository.save(location);
+
+    add(ItemListRefreshed());
+  }
+
+  Future<void> _onProducerCreated(ProducerCreated event, Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
     final newItem = Producer(
@@ -153,8 +266,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ProducerInitialized(newItem));
   }
 
-  Future<void> _onProducerInit(ProducerInitialized event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onProducerInit(ProducerInitialized event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.initProducer(event.producer);
     final dto = await _solanaServicePort.fetchProducerAccount(event.producer);
 
@@ -177,17 +289,15 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ItemListRefreshed());
   }
 
-  Future<void> _onProductionStarted(ProductionStarted event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onProductionStarted(ProductionStarted event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.produce(event.producer, event.storage);
     add(StorageRefreshed(event.storage));
   }
 
-  Future<void> _onResourceCreated(ResourceCreated event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onResourceCreated(ResourceCreated event, Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
-    final owner = await _getGame();
+    final owner = await getGame();
     final newItem = Resource(await ItemId.random(), owner, false, nowMillis, event.name);
     final saved = _itemRepository.save(newItem);
 
@@ -201,8 +311,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ResourceInitialized(newItem));
   }
 
-  Future<void> _onResourceInit(ResourceInitialized event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onResourceInit(ResourceInitialized event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.initResource(event.resource);
     final dto = await _solanaServicePort.fetchResourceAccount(event.resource);
 
@@ -217,8 +326,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ItemListRefreshed());
   }
 
-  Future<void> _onStorageCreated(StorageCreated event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onStorageCreated(StorageCreated event, Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
     final newItem = Storage(
@@ -247,15 +355,13 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(StorageInitialized(newItem));
   }
 
-  Future<void> _onStorageInit(StorageInitialized event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onStorageInit(StorageInitialized event, Emitter<ItemListState> emit) async {
     await _solanaServicePort.initStorage(event.storage);
 
     add(StorageRefreshed(event.storage));
   }
 
-  Future<void> _onStorageRefresh(StorageRefreshed event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onStorageRefresh(StorageRefreshed event, Emitter<ItemListState> emit) async {
     final dto = await _solanaServicePort.fetchStorageAccount(event.storage);
 
     final storage = event.storage.copyWith(
