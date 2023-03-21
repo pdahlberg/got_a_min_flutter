@@ -42,7 +42,7 @@ class Unit extends Item {
   }
 
   @override
-  String label() => "${owner?.getName()}'s $name @ ${location.posX}x${location.posY} ${id.publicKey.toShortString()}";
+  String label() => "${owner?.getName()}'s $name @ ${location.posX}x${location.posY} $id";
 
   @override
   String toString() {

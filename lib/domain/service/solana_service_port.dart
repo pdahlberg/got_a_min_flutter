@@ -13,6 +13,7 @@ import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/model/unit.dart';
+import 'package:solana/solana.dart';
 
 abstract class SolanaServicePort {
 
@@ -26,7 +27,7 @@ abstract class SolanaServicePort {
 
   initMap(GameMap map);
 
-  initUnit(Unit unit);
+  Future<ItemId> initUnit(Unit unit);
 
   produce(Producer producer, Storage storage);
 

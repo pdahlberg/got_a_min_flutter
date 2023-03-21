@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_bloc.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_events.dart';
 import 'package:got_a_min_flutter/domain/bloc/item_list_state.dart';
@@ -18,6 +19,7 @@ import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/model/unit.dart';
+import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
@@ -139,6 +141,8 @@ class ItemListPage extends StatelessWidget {
     final canCreateStorage = existingLocation != null && existingResource != null && player != null;
     final canCreateUnit = existingLocation != null && player != null;
 
+    SolanaServicePort ssi = context.read();
+
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
       direction: Axis.horizontal,
@@ -199,9 +203,15 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateUnit ? () {
-            context.itemListBloc.add(UnitCreated(player, existingLocation, "unit-name"));
+            context.itemListBloc.add(UnitCreated(player, existingLocation, "name"));
           } : null,
           child: const Text("+Unit"),
+        ),
+        OutlinedButton(
+          onPressed: () {
+            (ssi as SolanaServiceImpl).test();
+          },
+          child: const Text("Unit-y"),
         ),
       ],
     );

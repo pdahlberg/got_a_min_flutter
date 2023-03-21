@@ -1,15 +1,9 @@
 
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:flutter/foundation.dart';
-import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/invoke_base.dart';
-import 'package:got_a_min_flutter/domain/model/item.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/with_to_borsh.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/domain/model/player.dart';
-import 'package:solana/anchor.dart';
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart';
 
@@ -18,7 +12,6 @@ part 'instructions.g.dart';
 @BorshSerializable()
 class InitLocation with _$InitLocation implements WithToBorsh<InitLocation> {
   factory InitLocation({
-    @BString() required String name,
     @BU64() required BigInt pos_x,
     @BU64() required BigInt pos_y,
     @BU64() required BigInt capacity,
@@ -35,7 +28,6 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
   InvokeInitLocation(super.client, super.programId, super.owner);
 
   run(Location location) async {
-    var name = location.name;
     debugPrint("x: ${location.posX}");
     debugPrint("y: ${location.posY}");
 
@@ -52,7 +44,6 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
     await send(
       method: 'init_location',
       params: InitLocation(
-        name: name,
         pos_x: BigInt.from(location.posX),
         pos_y: BigInt.from(location.posY),
         capacity: BigInt.from(location.capacity),

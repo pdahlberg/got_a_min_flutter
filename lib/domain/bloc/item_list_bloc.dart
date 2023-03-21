@@ -22,6 +22,7 @@ import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/model/unit.dart';
 import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
+import 'package:got_a_min_flutter/domain/persistence/location_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/producer_repository.dart';
 import 'package:got_a_min_flutter/domain/persistence/storage_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
@@ -35,6 +36,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   final SolanaServicePort _solanaServicePort;
   final StorageRepository _storageRepository;
   final ProducerRepository _producerRepository;
+  final LocationRepository _locationRepository;
   StreamSubscription<int>? listenerAutoProducer;
   StreamSubscription<int>? listenerProductionSync;
 
@@ -42,7 +44,9 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       this._itemRepository,
       this._solanaServicePort,
       this._storageRepository,
-      this._producerRepository,) : super(const ItemListState()) {
+      this._producerRepository,
+      this._locationRepository,
+  ) : super(const ItemListState()) {
     on<ItemListRefreshed>(_onRefresh);
     on<GameMapCreated>(_onGameMapCreated);
     on<GameMapInitialized>(_onGameMapInit);
@@ -63,6 +67,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   }
 
   ItemListBloc.of(BuildContext context) : this(
+    context.read(),
     context.read(),
     context.read(),
     context.read(),
@@ -203,8 +208,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
     add(ItemListRefreshed());
   }
 
-  Future<void> _onUnitCreated(UnitCreated event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onUnitCreated(UnitCreated event, Emitter<ItemListState> emit) async {
     final newItem = Unit.uninitialized(
       event.player,
       event.location,
@@ -223,18 +227,20 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   }
 
   Future<void> _onUnitInit(UnitInitialized event, Emitter<ItemListState> emit) async {
-    await _solanaServicePort.initUnit(event.unit);
+    final itemId = await _solanaServicePort.initUnit(event.unit);
     final dto = await _solanaServicePort.fetchUnitAccount(event.unit);
 
-    final location = event.unit.copyWith(
+    var loc = _locationRepository.findByAddress(dto.atLocationId);
+
+    final unit = event.unit.copyWith(
+      id: itemId,
       name: dto.name,
       initialized: dto.initialized,
       timestamp: _timeService.nowMillis(),
+      location: loc,
     );
 
-    debugPrint("locinit: ${location.initialized}, ${dto.initialized}");
-
-    _itemRepository.save(location);
+    _itemRepository.save(unit);
 
     add(ItemListRefreshed());
   }
