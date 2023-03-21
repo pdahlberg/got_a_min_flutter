@@ -20,6 +20,8 @@ class ItemId extends Equatable {
     return ItemId(kp, kp.publicKey);
   }
 
+  bool get hasPubKey => pubKey != nothingPubKey;
+
   Ed25519HDPublicKey get publicKey {
     if(pubKey == nothingPubKey) {
       throw UnimplementedError("ItemId.pubKey is null");

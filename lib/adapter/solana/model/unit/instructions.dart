@@ -31,6 +31,8 @@ class InvokeUnitCall extends InvokeBase<InitUnit> {
   init(String name, Location location) async {
     final pda = await getPda(name);
 
+    debugPrint("Unit init: ${pda.toBase58()}");
+
     final result = await send(
       method: 'init_unit',
       params: InitUnit(
@@ -48,7 +50,9 @@ class InvokeUnitCall extends InvokeBase<InitUnit> {
       ],
     );
 
-    final txDetails = await super.client!.rpcClient.getTransaction(result);
+    debugPrint("Unit init sent: $result");
+
+    final txDetails = await super.client.rpcClient.getTransaction(result);
     debugPrint("txDetails: $txDetails");
   }
 

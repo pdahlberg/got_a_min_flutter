@@ -31,5 +31,8 @@ class LocationDto {
     }
   }
 
-
+  @override
+  String toString() {
+    return 'LocationDto{initialized: $initialized, name: $name, owner: $owner, occupiedSpace: $occupiedSpace, capacity: $capacity, posX: $posX, posY: $posY, locationType: $locationType}';
+  }
 }

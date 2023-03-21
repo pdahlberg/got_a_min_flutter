@@ -1,4 +1,7 @@
 
+import 'dart:convert';
+
+import 'package:borsh_annotation/borsh_annotation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/location/instructions.dart';
@@ -21,6 +24,8 @@ import 'package:got_a_min_flutter/domain/dto/unit_dto.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/location_type.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
@@ -35,17 +40,19 @@ import 'model/location/account.dart';
 class SolanaServiceImpl extends SolanaServicePort {
 
   static const DEFAULT_SLOT_TIME = 400;
-  static const devnetRpcUrl = 'http://127.0.0.1:8899';
-  static const devnetWebsocketUrl = 'ws://127.0.0.1:8900';
+  //static const rpcUrl = "https://3995-94-60-19-142.eu.ngrok.io";
+  //static const websocketUrl = "https://7568-94-60-19-142.eu.ngrok.io";
+  static const rpcUrl = 'http://127.0.0.1:8899';
+  static const websocketUrl = 'ws://127.0.0.1:8900';
   static final programId = Ed25519HDPublicKey.fromBase58(
-    '3113AWybUqHaSKaEmUXnUFwXu4EUp1VDpqQFCvY7oajN',
+    'CbU9TfAS58V2JprRyMZ54hM48nMseTxth6FW6sCW79nM',
   );
   final TimeService _timeService;
   final SolanaClient _solanaClient;
 
   static SolanaClient _createTestSolanaClient() => SolanaClient(
-    rpcUrl: Uri.parse(devnetRpcUrl),
-    websocketUrl: Uri.parse(devnetWebsocketUrl),
+    rpcUrl: Uri.parse(rpcUrl),
+    websocketUrl: Uri.parse(websocketUrl),
   );
 
   SolanaServiceImpl(
@@ -139,10 +146,21 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
-  initUnit(Unit unit) async {
-    await devAirdrop(unit.id);
+  Future<ItemId> initUnit(Unit unit) async {
+    var locDto = await fetchLocationAccount(unit.location);
+    debugPrint("locDto: $locDto");
 
-    await InvokeUnitCall(_solanaClient, programId, unit.owner!).init(unit.name, unit.location);
+    var invoke = InvokeUnitCall(_solanaClient, programId, unit.owner!);
+    var unitId = unit.id;
+    if(!unit.initialized) {
+      unitId = ItemId.ofPda(await invoke.getPda(unit.name));
+      debugPrint("airdrop to: $unitId");
+      await devAirdrop(unitId);
+    }
+
+    await invoke.init(unit.name, unit.location);
+
+    return unitId;
   }
 
   @override
@@ -241,6 +259,49 @@ class SolanaServiceImpl extends SolanaServicePort {
       encoding: Encoding.base64,
     );
     return decode(account!.data!);
+  }
+
+  Iterable<int> i64Bytes(int num) {
+    final writer1 = BinaryWriter();
+    const BU64().write(writer1, BigInt.from(num));
+    Uint8List uint8list = writer1.toArray();
+    return uint8list;
+  }
+
+  Future<void> test() async {
+    var payer = await Ed25519HDKeyPair.random();
+    var p1 = Player(ItemId(payer, null), "p1");
+
+    await devAirdrop(p1.id);
+
+    final initLoc = InvokeInitLocation(_solanaClient, SolanaServiceImpl.programId, p1);
+    final x = 1;
+    final y = 0;
+
+    final locationPda = await Ed25519HDPublicKey.findProgramAddress(
+      seeds: [
+        utf8.encode("map-location"),
+        p1.getId().publicKey.bytes,
+        i64Bytes(x),
+        i64Bytes(y),
+      ],
+      programId: SolanaServiceImpl.programId,
+    );
+
+    final location = Location(ItemId(null, locationPda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
+    await initLoc.run(location);
+
+    // -------------------------
+
+    final unitInstructions = InvokeUnitCall(_solanaClient, SolanaServiceImpl.programId, p1);
+
+    //await requestAirdrop(client, map.id.keyPair!);
+
+    var name = "name";
+    await unitInstructions.init(name, location);
+
+    final unitPda = await unitInstructions.getPda(name);
+    debugPrint("Unit pda: ${unitPda.toBase58()}");
   }
 
 }

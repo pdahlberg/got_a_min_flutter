@@ -9,6 +9,7 @@ import 'package:got_a_min_flutter/adapter/solana/model/map/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/storage/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/stuff/instructions.dart';
+import 'package:got_a_min_flutter/adapter/solana/model/unit/account.dart';
 import 'package:got_a_min_flutter/adapter/solana/model/unit/instructions.dart';
 import 'package:got_a_min_flutter/adapter/solana/solana_service_impl.dart';
 import 'package:got_a_min_flutter/domain/model/compressed_sparse_matrix.dart';
@@ -94,13 +95,32 @@ void main() {
     debugPrint("map dto: $dto");
   });
 
+  Future<UnitAccount> fetchAccount(String pubKey) async {
+    final publicKey = Ed25519HDPublicKey.fromBase58(pubKey);
+    final account = await client.rpcClient.getAccountInfo(
+      publicKey.toBase58(),
+      commitment: Commitment.confirmed,
+      encoding: Encoding.base64,
+    );
+    return UnitAccount.fromAccountData(account!.data!);
+  }
+
+  test('Unit account', () async {
+    debugPrint("Things that differ:");
+    debugPrint("- owner");
+    debugPrint("- location");
+
+    var abc = await fetchAccount("FAsxWgNxanhKFubyr6JDhk9GcpxARkwGjUsqbmJfVAZM");
+    debugPrint("abc: ${abc.name}");
+  });
+
   test('Init Unit', () async {
     // -------------------------
     final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
-    final x = 2;
-    final y = 1;
+    final x = 1;
+    final y = 0;
 
-    final pda = await Ed25519HDPublicKey.findProgramAddress(
+    final locationPda = await Ed25519HDPublicKey.findProgramAddress(
       seeds: [
         utf8.encode("map-location"),
         p1.getId().publicKey.bytes,
@@ -110,16 +130,19 @@ void main() {
       programId: SolanaServiceImpl.programId,
     );
 
-    final location = Location(ItemId(null, pda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
+    final location = Location(ItemId(null, locationPda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
     await initLoc.run(location);
 
     // -------------------------
 
-    final instr = InvokeUnitCall(client, SolanaServiceImpl.programId, p1);
+    final unitInstructions = InvokeUnitCall(client, SolanaServiceImpl.programId, p1);
 
     //await requestAirdrop(client, map.id.keyPair!);
 
-    await instr.init("name", location);
+    await unitInstructions.init("name", location);
+
+    final unitPda = await unitInstructions.getPda("name");
+    debugPrint("Unit pda: ${unitPda.toBase58()}");
 
     //final dto = await solanaService.fetchMapAccount(map);
 
