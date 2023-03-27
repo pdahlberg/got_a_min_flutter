@@ -19,6 +19,7 @@ import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/model/unit.dart';
+import 'package:got_a_min_flutter/domain/persistence/item_repository.dart';
 import 'package:got_a_min_flutter/domain/service/solana_service_port.dart';
 import 'package:got_a_min_flutter/infra/app_router.dart';
 import 'package:got_a_min_flutter/infra/extension_methods.dart';
@@ -39,7 +40,7 @@ class ItemListPage extends StatelessWidget {
             itemBuilder: (BuildContext context, int index) {
               if(index < state.items.length) {
                 final item = state.items[index];
-                debugPrint("$item");
+                debugPrint("item in list: $item");
                 return ListTile(
                   title: Text(item.label()),
                   /*onTap: () {
@@ -142,6 +143,7 @@ class ItemListPage extends StatelessWidget {
     final canCreateUnit = existingLocation != null && player != null;
 
     SolanaServicePort ssi = context.read();
+    ItemRepository itemRepo = context.read();
 
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
@@ -203,15 +205,21 @@ class ItemListPage extends StatelessWidget {
         ),
         OutlinedButton(
           onPressed: canCreateUnit ? () {
-            context.itemListBloc.add(UnitCreated(player, existingLocation, "name"));
+            context.itemListBloc.add(UnitCreated(player, existingLocation, "B"));
           } : null,
           child: const Text("+Unit"),
         ),
         OutlinedButton(
           onPressed: () {
-            (ssi as SolanaServiceImpl).test();
+            (ssi as SolanaServiceImpl).test(player!, existingLocation!);
           },
           child: const Text("Unit-y"),
+        ),
+        OutlinedButton(
+          onPressed: () {
+            itemRepo.findAll();
+          },
+          child: const Text("print info"),
         ),
       ],
     );

@@ -23,11 +23,13 @@ class ItemRepository {
       timestamp: _timeService.nowMillis(),
     );*/
 
-    return db.update(
+    var res = db.update(
       item.id,
       (value) => item,
       ifAbsent: () => item,
     );
+
+    return res;
   }
 
   Item? findById(ItemId id) {

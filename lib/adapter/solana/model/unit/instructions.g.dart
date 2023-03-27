@@ -10,6 +10,7 @@ mixin _$InitUnit {
   String get name => throw UnimplementedError();
   BigInt get x => throw UnimplementedError();
   BigInt get y => throw UnimplementedError();
+  List<int> get game => throw UnimplementedError();
 
   Uint8List toBorsh() {
     final writer = BinaryWriter();
@@ -17,6 +18,7 @@ mixin _$InitUnit {
     const BString().write(writer, name);
     const BU64().write(writer, x);
     const BU64().write(writer, y);
+    const BFixedArray(32, BU8()).write(writer, game);
 
     return writer.toArray();
   }
@@ -27,11 +29,13 @@ class _InitUnit extends InitUnit {
     required this.name,
     required this.x,
     required this.y,
+    required this.game,
   }) : super._();
 
   final String name;
   final BigInt x;
   final BigInt y;
+  final List<int> game;
 }
 
 class BInitUnit implements BType<InitUnit> {
@@ -48,6 +52,7 @@ class BInitUnit implements BType<InitUnit> {
       name: const BString().read(reader),
       x: const BU64().read(reader),
       y: const BU64().read(reader),
+      game: const BFixedArray(32, BU8()).read(reader),
     );
   }
 }

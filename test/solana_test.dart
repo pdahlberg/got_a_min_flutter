@@ -116,22 +116,24 @@ void main() {
 
   test('Init Unit', () async {
     // -------------------------
-    final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, p1);
+    final game = await solanaService.getGame();
+    final initLoc = InvokeInitLocation(client, SolanaServiceImpl.programId, game);
     final x = 1;
     final y = 0;
 
     final locationPda = await Ed25519HDPublicKey.findProgramAddress(
       seeds: [
         utf8.encode("map-location"),
-        p1.getId().publicKey.bytes,
+        game.getId().publicKey.bytes,
         i64Bytes(x),
         i64Bytes(y),
       ],
       programId: SolanaServiceImpl.programId,
     );
 
-    final location = Location(ItemId(null, locationPda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
+    final location = Location(ItemId(null, locationPda), game, false, 0, "loc", x, y, 100, 0, LocationType.space);
     await initLoc.run(location);
+    final locationDto = await solanaService.fetchLocationAccount(location);
 
     // -------------------------
 

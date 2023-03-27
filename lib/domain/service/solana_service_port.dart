@@ -5,15 +5,15 @@ import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/unit_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
-import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
+import 'package:got_a_min_flutter/domain/model/player.dart';
 import 'package:got_a_min_flutter/domain/model/producer.dart';
 import 'package:got_a_min_flutter/domain/model/resource.dart';
 import 'package:got_a_min_flutter/domain/model/storage.dart';
 import 'package:got_a_min_flutter/domain/model/unit.dart';
-import 'package:solana/solana.dart';
 
 abstract class SolanaServicePort {
 
@@ -27,7 +27,9 @@ abstract class SolanaServicePort {
 
   initMap(GameMap map);
 
-  Future<ItemId> initUnit(Unit unit);
+  initUnit(Unit unit);
+
+  Future<ItemId> unitPda(Player player, String unitName);
 
   produce(Producer producer, Storage storage);
 
@@ -46,5 +48,7 @@ abstract class SolanaServicePort {
   Future<int> averageSlotTime();
 
   Future<void> devAirdrop(ItemId id);
+
+  Future<Game> getGame();
 
 }

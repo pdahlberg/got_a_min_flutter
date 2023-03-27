@@ -1,10 +1,9 @@
 
 import 'package:got_a_min_flutter/domain/model/item.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
+import 'package:got_a_min_flutter/domain/model/location.dart';
 import 'package:got_a_min_flutter/domain/model/owner.dart';
 import 'package:got_a_min_flutter/domain/model/player.dart';
-import 'package:got_a_min_flutter/domain/model/location.dart';
-import 'package:got_a_min_flutter/infra/extension_methods.dart';
 
 class Unit extends Item {
 
@@ -20,7 +19,7 @@ class Unit extends Item {
     this.location,
   );
   //const Unit.from(String name) : this(const ItemId.empty(), name, 0, null, false);
-  Unit.uninitialized(Player player, Location location, String name) : this(ItemId.empty(), player, false, 0, name, location);
+  const Unit.uninitialized(ItemId id, Player player, Location location, String name) : this(id, player, false, 0, name, location);
   Unit.empty() : this(ItemId.empty(), null, false, 0, "", Location.empty());
 
   Unit copyWith({

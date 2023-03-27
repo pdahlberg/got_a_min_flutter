@@ -31,7 +31,7 @@ class GameMap extends Item implements Owner {
 
   @override
   String label() {
-    return matrix.toString();
+    return "temporary removed"; // matrix.toString();
   }
 
   @override

@@ -99,7 +99,7 @@ class _AccountData with _$_AccountData {
         str = "$str\n";
       }
     }
-    debugPrint("fromBorsh:\n$str");
+    //debugPrint("fromBorsh:\n$str");
     return _$_AccountDataFromBorsh(data);
   }
 }

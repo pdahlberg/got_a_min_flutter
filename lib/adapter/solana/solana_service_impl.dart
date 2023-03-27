@@ -21,6 +21,7 @@ import 'package:got_a_min_flutter/domain/dto/producer_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/resource_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/storage_dto.dart';
 import 'package:got_a_min_flutter/domain/dto/unit_dto.dart';
+import 'package:got_a_min_flutter/domain/model/game.dart';
 import 'package:got_a_min_flutter/domain/model/game_map.dart';
 import 'package:got_a_min_flutter/domain/model/item_id.dart';
 import 'package:got_a_min_flutter/domain/model/location.dart';
@@ -146,21 +147,29 @@ class SolanaServiceImpl extends SolanaServicePort {
   }
 
   @override
-  Future<ItemId> initUnit(Unit unit) async {
+  initUnit(Unit unit) async {
     var locDto = await fetchLocationAccount(unit.location);
-    debugPrint("locDto: $locDto");
+    debugPrint("initUnit locDto: $locDto");
 
     var invoke = InvokeUnitCall(_solanaClient, programId, unit.owner!);
     var unitId = unit.id;
     if(!unit.initialized) {
       unitId = ItemId.ofPda(await invoke.getPda(unit.name));
-      debugPrint("airdrop to: $unitId");
+      debugPrint("initUnit airdrop to: $unitId");
       await devAirdrop(unitId);
     }
 
+    debugPrint("initUnit id: ${unitId.publicKey.toBase58()}");
+    debugPrint("initUnit location id: ${unit.location.id.publicKey.toBase58()}, is init: ${unit.location.initialized}");
+    debugPrint("initUnit loc owner: ${unit.location.owner!.getId().publicKey.toBase58()}");
     await invoke.init(unit.name, unit.location);
 
     return unitId;
+  }
+
+  Future<ItemId> unitPda(Player player, String unitName) async {
+    var invoke = InvokeUnitCall(_solanaClient, programId, player);
+    return ItemId.ofPda(await invoke.getPda(unitName));
   }
 
   @override
@@ -268,27 +277,28 @@ class SolanaServiceImpl extends SolanaServicePort {
     return uint8list;
   }
 
-  Future<void> test() async {
+  Future<void> test(Player p1, Location locNotWorking) async {
     var payer = await Ed25519HDKeyPair.random();
-    var p1 = Player(ItemId(payer, null), "p1");
+    //var p1 = Player(ItemId(payer, null), "p1");
 
     await devAirdrop(p1.id);
 
-    final initLoc = InvokeInitLocation(_solanaClient, SolanaServiceImpl.programId, p1);
+    var game = await getGame();
+    final initLoc = InvokeInitLocation(_solanaClient, SolanaServiceImpl.programId, game);
     final x = 1;
     final y = 0;
 
     final locationPda = await Ed25519HDPublicKey.findProgramAddress(
       seeds: [
         utf8.encode("map-location"),
-        p1.getId().publicKey.bytes,
+        game.getId().publicKey.bytes, // fails when owner is game, works with p1
         i64Bytes(x),
         i64Bytes(y),
       ],
       programId: SolanaServiceImpl.programId,
     );
 
-    final location = Location(ItemId(null, locationPda), p1, false, 0, "loc", x, y, 100, 0, LocationType.space);
+    final location = Location(ItemId(null, locationPda), game, false, 0, "loc", x, y, 100, 0, LocationType.space);
     await initLoc.run(location);
 
     // -------------------------
@@ -298,10 +308,37 @@ class SolanaServiceImpl extends SolanaServicePort {
     //await requestAirdrop(client, map.id.keyPair!);
 
     var name = "name";
-    await unitInstructions.init(name, location);
+    //await unitInstructions.init(name, location);
 
     final unitPda = await unitInstructions.getPda(name);
     debugPrint("Unit pda: ${unitPda.toBase58()}");
+
+    var unit = Unit(ItemId.ofPda(unitPda), p1, false, 0, name, location);
+    await initUnit(unit);
+    var fetched = await fetchUnitAccount(unit);
+    debugPrint("Unit account: $fetched");
+
+    var gamePubKey = game.id.publicKey.toBase58();
+    debugPrint("Game: $gamePubKey");
+    var l1 = await fetchLocationAccount(locNotWorking);
+    debugPrint("locNotWorking: $l1");
+    var locationNotWorkingGamePubKey = locNotWorking.owner!.getId().publicKey.toBase58();
+    debugPrint("locNotWorking owner: $locationNotWorkingGamePubKey");
+    var l2 = await fetchLocationAccount(location);
+    var locationGamePubKey = location.owner!.getId().publicKey.toBase58();
+    debugPrint("Loc working owner: $locationGamePubKey");
+    debugPrint("loc working: $l2");
+
   }
 
+  Game? _game;
+  Future<Game> getGame() async {
+    if (_game == null) {
+      final id = await ItemId.random();
+      debugPrint("===> Game is null, creating new => ${id.publicKey.toBase58()}");
+      await devAirdrop(id);
+      _game = Game(id);
+    }
+    return _game!;
+  }
 }

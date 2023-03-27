@@ -78,22 +78,18 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   Game? _game;
 
   Future<Game> getGame() async {
-    if (_game == null) {
-      final id = await ItemId.random();
-      await _solanaServicePort.devAirdrop(id);
-      _game = Game(id);
-    }
-    return _game!;
+    return _solanaServicePort.getGame();
   }
 
-  Future<void> _onRefresh(ItemListRefreshed event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onRefresh(ItemListRefreshed event, Emitter<ItemListState> emit) async {
     //emit(state.copyWith(items: [])); // Not nice, but needed with fake item db
+
+    await _solanaServicePort.getGame();
+
     emit(state.copyWith(items: _itemRepository.findAll()));
   }
 
-  Future<void> _onGameMapCreated(GameMapCreated event,
-      Emitter<ItemListState> emit) async {
+  Future<void> _onGameMapCreated(GameMapCreated event, Emitter<ItemListState> emit) async {
     var nowMillis = _timeService.nowMillis();
 
     final game = await getGame();
@@ -173,7 +169,7 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
       event.posY,
       100,
       0,
-      LocationType.unexplored,
+      LocationType.space, // todo: should be unexplored
     );
     final saved = _itemRepository.save(newItem);
 
@@ -203,18 +199,27 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
 
     debugPrint("locinit: ${location.initialized}, ${dto.initialized}");
 
-    _itemRepository.save(location);
+    _locationRepository.save(location);
+    _locationRepository.findAll();
 
     add(ItemListRefreshed());
   }
 
   Future<void> _onUnitCreated(UnitCreated event, Emitter<ItemListState> emit) async {
+    final pda = await _solanaServicePort.unitPda(event.player, event.name);
+
     final newItem = Unit.uninitialized(
+      pda,
       event.player,
       event.location,
       event.name,
     );
+
+    debugPrint("-------");
+    _itemRepository.findAll();
     final saved = _itemRepository.save(newItem);
+    _itemRepository.findAll();
+    debugPrint("-------");
 
     emit(state.copyWith(
       items: [
@@ -227,14 +232,21 @@ class ItemListBloc extends Bloc<ItemListEvent, ItemListState> {
   }
 
   Future<void> _onUnitInit(UnitInitialized event, Emitter<ItemListState> emit) async {
+    debugPrint("_onUnitInit: ${event.unit}");
     final itemId = await _solanaServicePort.initUnit(event.unit);
+    debugPrint("_onUnitInit itemId: $itemId");
     final dto = await _solanaServicePort.fetchUnitAccount(event.unit);
+    debugPrint("_onUnitInit dto: $dto");
+
+    debugPrint("_locationRepository: ${_locationRepository.findAll().length}");
+    _locationRepository.findAll().forEach((item) {
+      debugPrint("location: $item");
+    });
+    debugPrint("findByAddress: ${dto.atLocationId}");
 
     var loc = _locationRepository.findByAddress(dto.atLocationId);
 
     final unit = event.unit.copyWith(
-      id: itemId,
-      name: dto.name,
       initialized: dto.initialized,
       timestamp: _timeService.nowMillis(),
       location: loc,

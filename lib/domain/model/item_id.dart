@@ -35,6 +35,6 @@ class ItemId extends Equatable {
   }
 
   @override
-  List<Object?> get props => [keyPair];
+  List<Object?> get props => [pubKey];
 
 }

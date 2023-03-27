@@ -17,6 +17,7 @@ class InitUnit with _$InitUnit implements WithToBorsh<InitUnit> {
     @BString() required String name,
     @BU64() required BigInt x,
     @BU64() required BigInt y,
+    @BFixedArray(32, BU8()) required List<int> game,
   }) = _InitUnit;
 
   InitUnit._();
@@ -39,6 +40,7 @@ class InvokeUnitCall extends InvokeBase<InitUnit> {
         name: name,
         x: BigInt.from(location.posX),
         y: BigInt.from(location.posY),
+        game: location.owner!.getId().publicKey.bytes,
       ),
       accounts: <AccountMeta>[
         AccountMeta.writeable(pubKey: pda, isSigner: false),

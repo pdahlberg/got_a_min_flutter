@@ -28,8 +28,7 @@ class InvokeInitLocation extends InvokeBase<InitLocation> {
   InvokeInitLocation(super.client, super.programId, super.owner);
 
   run(Location location) async {
-    debugPrint("x: ${location.posX}");
-    debugPrint("y: ${location.posY}");
+    debugPrint("x: ${location.posX}, y: ${location.posY}");
 
     final pda = await Ed25519HDPublicKey.findProgramAddress(
         seeds: [
